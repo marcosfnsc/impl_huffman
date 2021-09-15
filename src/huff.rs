@@ -3,13 +3,13 @@ use std::{fs::File, io::Write};
 #[derive(Clone, Debug, PartialEq)]
 pub struct Node {
     elemento: Option<u8>,
-    freq: u32,
+    freq: usize,
     left: Option<Box<Node>>,
     right: Option<Box<Node>>,
 }
 
 impl Node {
-    fn new(elt: Option<u8>, frq: u32) -> Self {
+    fn new(elt: Option<u8>, frq: usize) -> Self {
         Self {
             elemento: elt,
             freq: frq,
@@ -21,7 +21,7 @@ impl Node {
         self.elemento.unwrap()
     }
 
-    pub fn get_freq(&self) -> u32 {
+    pub fn get_freq(&self) -> usize {
         self.freq
     }
 }
