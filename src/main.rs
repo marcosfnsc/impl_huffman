@@ -1,6 +1,6 @@
-use std::env;
-use std::fs;
-use std::io::Write;
+//use std::env;
+//use std::fs;
+//use std::io::Write;
 
 mod huff;
 mod utils;
@@ -17,6 +17,7 @@ fn menu() {
 }
 
 fn main() {
+    /*
     let args: Vec<String> = env::args().collect();
     if args.len() == 2 && args[1] == "-h" {
         menu();
@@ -109,4 +110,5 @@ fn main() {
             println!(""); // pular linha
         }
     }
+    */
 }
