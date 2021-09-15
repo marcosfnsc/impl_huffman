@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::{fs::File, io::Write};
 
 #[derive(Clone, Debug, PartialEq)]
@@ -27,13 +28,12 @@ impl Node {
 }
 
 
-pub fn frequency(array: &mut Vec<u8>) -> Vec<Node> {
-    let mut array_nodes: Vec<Node> = Vec::new();
-
+pub fn frequency(array: &mut Vec<u8>) -> VecDeque<Node> {
+    let mut array_nodes: VecDeque<Node> = VecDeque::new();
     while array.len() != 0 {
         let elt = array[0];
         let frq = array.iter().filter(|&n| *n == elt).count();
-        array_nodes.push(Node::new(Some(elt), frq as u32));
+        array_nodes.push_back(Node::new(Some(elt), frq));
 
         array.retain(|value| *value != elt);
     }
@@ -176,12 +176,11 @@ mod tests {
     #[test]
     fn test_frequency() {
         let mut v = vec![32, 32, 32, 1, 4, 1, 110, 110];
-        let v_node = vec![
-            Node::new(Some(32), 3),
-            Node::new(Some(1), 2),
-            Node::new(Some(4), 1),
-            Node::new(Some(110), 2),
-        ];
+        let mut v_node = VecDeque::new();
+        v_node.push_back(Node::new(Some(32),  3));
+        v_node.push_back(Node::new(Some(1),   2));
+        v_node.push_back(Node::new(Some(4),   1));
+        v_node.push_back(Node::new(Some(110), 2));
 
         assert_eq!(v_node, frequency(&mut v));
     }
