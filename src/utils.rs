@@ -15,7 +15,7 @@ pub fn bitvec_to_decimal(v: &[u8]) -> u8 {
 
 pub fn decimal_to_bitvec(decimal: u8) -> Vec<u8> {
     let mut decimal = decimal;
-    let mut bitvec: Vec<u8> = Vec::new();
+    let mut bitvec: Vec<u8> = Vec::with_capacity(8);
 
     while decimal > 1 {
         let rest = decimal % 2;
