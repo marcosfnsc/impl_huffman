@@ -55,39 +55,39 @@ pub fn create_tree(array_nodes: &mut VecDeque<Node>) -> Node {
     array_nodes.pop_front().unwrap()
 }
 
-fn walk_through_tree(elt: u8, node: &Node, bits: &mut Vec<u8>) -> bool {
-    let mut valid_path = false;
-    let mut result_left = false;
-    let mut result_right = false;
+pub fn encode_element(elt: u8, node: &Node) -> VecDeque<u8> {
+    let mut bits = VecDeque::new();
 
-    if let Some(n) = node.elemento {
-        if n == elt {
-            valid_path = true;
-        }
-    } else {
-        if let Some(left) = &node.left {
-            result_left = walk_through_tree(elt, left, bits);
-            if result_left {
-                bits.insert(0, 0);
+    fn walk_through_tree(elt: u8, node: &Node, bits: &mut VecDeque<u8>) -> bool {
+        let mut valid_path = false;
+        let mut result_left = false;
+        let mut result_right = false;
+
+        if let Some(n) = node.elemento {
+            if n == elt {
+                valid_path = true;
             }
-        }
-        if let Some(right) = &node.right {
-            result_right = walk_through_tree(elt, right, bits);
-            if result_right {
-                bits.insert(0, 1);
-            }
-        }
-        if result_left || result_right {
-            valid_path = true;
         } else {
-            valid_path = false;
+            if let Some(left) = &node.left {
+                result_left = walk_through_tree(elt, left, bits);
+                if result_left {
+                    bits.push_front(0);
+                }
+            }
+            if let Some(right) = &node.right {
+                result_right = walk_through_tree(elt, right, bits);
+                if result_right {
+                    bits.push_front(1);
+                }
+            }
+            if result_left || result_right {
+                valid_path = true;
+            } else {
+                valid_path = false;
+            }
         }
+        valid_path
     }
-    valid_path
-}
-
-pub fn encode_elt(elt: u8, node: &Node) -> Vec<u8> {
-    let mut bits = Vec::new();
     walk_through_tree(elt, node, &mut bits);
     bits
 }
@@ -214,5 +214,16 @@ mod tests {
         let node_root = example_tree();
 
         assert_eq!(node_root, create_tree(&mut v_node));
+    }
+
+    #[test]
+    fn test_encode_element() {
+        let node_root = example_tree();
+
+        let v0 = VecDeque::from(vec![0, 1]);
+        assert_eq!(v0, encode_element(1, &node_root));
+
+        let v1 = VecDeque::from(vec![1, 0]);
+        assert_eq!(v1, encode_element(110, &node_root));
     }
 }
