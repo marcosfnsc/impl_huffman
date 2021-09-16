@@ -190,9 +190,7 @@ mod tests {
         assert_eq!(v_node, frequency(&mut v));
     }
 
-    #[test]
-    fn test_create_tree() {
-        let mut v_node = example_array_nodes();
+    fn example_tree() -> Node {
         let node0 = Node::new(Some(1),   2);
         let node1 = Node::new(Some(110), 2);
         let node2 = Node::new(Some(32),  3);
@@ -202,12 +200,19 @@ mod tests {
         node4.left  = Some(Box::new(node3));
         node4.right = Some(Box::new(node0));
         let mut node5 = Node::new(None, node1.freq+node2.freq);
-        node5.left = Some(Box::new(node1));
+        node5.left  = Some(Box::new(node1));
         node5.right = Some(Box::new(node2));
         let mut node6 = Node::new(None, node4.freq+node5.freq);
-        node6.left = Some(Box::new(node4));
+        node6.left  = Some(Box::new(node4));
         node6.right = Some(Box::new(node5));
+        node6
+    }
 
-        assert_eq!(node6, create_tree(&mut v_node));
+    #[test]
+    fn test_create_tree() {
+        let mut v_node = example_array_nodes();
+        let node_root = example_tree();
+
+        assert_eq!(node_root, create_tree(&mut v_node));
     }
 }
