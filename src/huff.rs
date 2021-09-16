@@ -80,11 +80,7 @@ pub fn encode_element(elt: u8, node: &Node) -> VecDeque<u8> {
                     bits.push_front(1);
                 }
             }
-            if result_left || result_right {
-                valid_path = true;
-            } else {
-                valid_path = false;
-            }
+            valid_path = result_left || result_right;
         }
         valid_path
     }
