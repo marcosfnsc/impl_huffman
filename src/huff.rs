@@ -32,12 +32,13 @@ pub fn frequency(array: &mut Vec<u8>) -> VecDeque<Node> {
     let mut array_nodes: VecDeque<Node> = VecDeque::new();
     while array.len() != 0 {
         let elt = array[0];
-        let frq = array.iter().filter(|&n| *n == elt).count();
-        array_nodes.push_back(Node::new(Some(elt), frq));
 
+        let prev_len = array.len();
         array.retain(|value| *value != elt);
-    }
+        let freq = prev_len - array.len();
 
+        array_nodes.push_back(Node::new(Some(elt), freq));
+    }
     array_nodes
 }
 
