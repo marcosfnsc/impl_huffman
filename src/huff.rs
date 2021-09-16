@@ -41,18 +41,18 @@ pub fn frequency(array: &mut Vec<u8>) -> VecDeque<Node> {
     array_nodes
 }
 
-pub fn create_tree(array_nodes: &mut Vec<Node>) -> Node {
+pub fn create_tree(array_nodes: &mut VecDeque<Node>) -> Node {
     while array_nodes.len() > 1 {
-        array_nodes.sort_by_key(|k| k.freq);
-        let node0 = array_nodes.remove(0);
-        let node1 = array_nodes.remove(0);
+        array_nodes.make_contiguous().sort_by_key(|k| k.freq);
+        let node0 = array_nodes.pop_front().unwrap();
+        let node1 = array_nodes.pop_front().unwrap();
 
         let mut new_node = Node::new(None, node0.freq+node1.freq);
         new_node.left = Some(Box::new(node0));
         new_node.right = Some(Box::new(node1));
-        array_nodes.push(new_node);
+        array_nodes.push_back(new_node);
     }
-    array_nodes.remove(0)
+    array_nodes.pop_front().unwrap()
 }
 
 fn walk_through_tree(elt: u8, node: &Node, bits: &mut Vec<u8>) -> bool {
@@ -173,15 +173,41 @@ pub fn decode_elt(bits: &mut Vec<u8>, node: &Node) -> u8 {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_frequency() {
-        let mut v = vec![32, 32, 32, 1, 4, 1, 110, 110];
+    fn example_array_nodes() -> VecDeque<Node> {
         let mut v_node = VecDeque::new();
         v_node.push_back(Node::new(Some(32),  3));
         v_node.push_back(Node::new(Some(1),   2));
         v_node.push_back(Node::new(Some(4),   1));
         v_node.push_back(Node::new(Some(110), 2));
+        v_node
+    }
+
+    #[test]
+    fn test_frequency() {
+        let mut v = vec![32, 32, 32, 1, 4, 1, 110, 110];
+        let v_node = example_array_nodes();
 
         assert_eq!(v_node, frequency(&mut v));
+    }
+
+    #[test]
+    fn test_create_tree() {
+        let mut v_node = example_array_nodes();
+        let node0 = Node::new(Some(1),   2);
+        let node1 = Node::new(Some(110), 2);
+        let node2 = Node::new(Some(32),  3);
+        let node3 = Node::new(Some(4),   1);
+
+        let mut node4 = Node::new(None, node3.freq+node0.freq);
+        node4.left  = Some(Box::new(node3));
+        node4.right = Some(Box::new(node0));
+        let mut node5 = Node::new(None, node1.freq+node2.freq);
+        node5.left = Some(Box::new(node1));
+        node5.right = Some(Box::new(node2));
+        let mut node6 = Node::new(None, node4.freq+node5.freq);
+        node6.left = Some(Box::new(node4));
+        node6.right = Some(Box::new(node5));
+
+        assert_eq!(node6, create_tree(&mut v_node));
     }
 }
