@@ -1,5 +1,5 @@
-//use std::env;
-//use std::fs;
+use std::env;
+use std::fs;
 //use std::io::Write;
 
 mod huff;
@@ -17,13 +17,13 @@ fn menu() {
 }
 
 fn main() {
-    /*
     let args: Vec<String> = env::args().collect();
     if args.len() == 2 && args[1] == "-h" {
         menu();
     } else if args.len() == 4 && args[1] == "-c" && args[2] == "-f" {
         //compress
 
+        /*
         let array_file = fs::read(&args[3]).unwrap();
         let mut array_nodes = huff::frequency(&mut array_file.clone());
         let node_root = huff::create_tree(&mut array_nodes);
@@ -54,10 +54,12 @@ fn main() {
             file.write(&[utils::bitvec_to_decimal(&bytes[0..8])]).unwrap();
             bytes.drain(0..8);
         }
+        */
 
     } else if  args.len() == 4 && args[1] == "-d" && args[2] == "-f" {
         // descompress
 
+        /*
         let mut array_file = fs::read(&args[3]).unwrap();
         let node_root = huff::file_to_tree(&mut array_file).unwrap();
 
@@ -75,7 +77,7 @@ fn main() {
         while array_file_converted.len() != 0 {
             file.write(&[huff::decode_elt(&mut array_file_converted, &node_root)]).unwrap();
         }
-
+        */
 
     } else if  args.len() == 4 && args[1] == "-s" && args[2] == "-f" {
         // tabela de simbolos
@@ -104,11 +106,10 @@ fn main() {
                      node.get_freq() as f32/array_nodes.len() as f32,
                      node.get_elt(),
                      " ");
-            for bit in huff::encode_elt(node.get_elt(), &node_root) {
+            for bit in huff::encode_element(node.get_elt(), &node_root) {
                 print!("{}", bit)
             }
             println!(""); // pular linha
         }
     }
-    */
 }
