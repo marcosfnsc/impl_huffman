@@ -154,16 +154,16 @@ pub fn file_to_tree(array: &mut Vec<u8>) -> Option<Node> {
     None
 }
 
-pub fn decode_elt(bits: &mut Vec<u8>, node: &Node) -> u8 {
+pub fn decode_element(bits: &mut Vec<u8>, node: &Node) -> u8 {
     if node.left.is_none() && node.right.is_none() {
         return node.get_elt();
     }
     if bits[0] == 0 {
         bits.remove(0);
-        return decode_elt(bits, node.left.as_ref().unwrap());
+        return decode_element(bits, node.left.as_ref().unwrap());
     } else {
         bits.remove(0);
-        return decode_elt(bits, node.right.as_ref().unwrap());
+        return decode_element(bits, node.right.as_ref().unwrap());
     }
 }
 
@@ -223,5 +223,13 @@ mod tests {
 
         let v1 = vec![1, 0];
         assert_eq!(v1, encode_element(110, &node_root));
+    }
+
+    #[test]
+    fn test_decode_element() {
+        let node_root = example_tree();
+
+        assert_eq!(1, decode_element(&mut vec![0, 1], &node_root));
+        assert_eq!(110, decode_element(&mut vec![1, 0], &node_root));
     }
 }
