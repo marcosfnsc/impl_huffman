@@ -1,7 +1,7 @@
 use std::env;
 use std::fs;
-//use std::io::Write;
 
+mod bits;
 mod huff;
 mod utils;
 
@@ -103,7 +103,7 @@ fn main() {
 
             print!("{:<12} {:<11} {:<11} {}",
                      node.get_freq(),
-                     node.get_freq() as f32/array_nodes.len() as f32,
+                     node.get_freq(),
                      node.get_elt(),
                      " ");
             for bit in huff::encode_element(node.get_elt(), &node_root) {
