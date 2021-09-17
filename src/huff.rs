@@ -58,31 +58,27 @@ pub fn create_tree(array_nodes: &mut Vec<Node>) -> Node {
 pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
     let mut bits = Vec::new();
 
-    fn walk_through_tree(elt: u8, node: &Node, bits: &mut Vec<u8>) -> bool {
-        let mut valid_path = false;
+    fn walk_through_tree(element: u8, node: &Node, bits: &mut Vec<u8>) -> bool {
         let mut result_left = false;
         let mut result_right = false;
 
-        if let Some(n) = node.element {
-            if n == elt {
-                valid_path = true;
-            }
+        if matches!(node.element, Some(n) if n == element) {
+            true
         } else {
             if let Some(left) = &node.left {
-                result_left = walk_through_tree(elt, left, bits);
+                result_left = walk_through_tree(element, left, bits);
                 if result_left {
                     bits.push(0);
                 }
             }
             if let Some(right) = &node.right {
-                result_right = walk_through_tree(elt, right, bits);
+                result_right = walk_through_tree(element, right, bits);
                 if result_right {
                     bits.push(1);
                 }
             }
-            valid_path = result_left || result_right;
+            result_left || result_right
         }
-        valid_path
     }
     walk_through_tree(elt, node, &mut bits);
     bits.reverse();
