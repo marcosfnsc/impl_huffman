@@ -1,7 +1,6 @@
 use std::env;
 use std::fs;
 
-mod bits;
 mod huff;
 mod utils;
 
