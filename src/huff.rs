@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write};
+use std::io::Write;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Node {
@@ -85,23 +85,23 @@ pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
     bits
 }
 
-pub fn tree_to_file(node: &Node, file: &mut File) {
+pub fn save_tree(node: &Node, object: &mut impl Write) {
     if let Some(c) = node.element {
-        file.write(&[c, 32]).unwrap();
+        object.write(&[c, 32]).unwrap();
     } else {
-        file.write(&[32, 110]).unwrap();
+        object.write(&[32, 110]).unwrap();
     }
 
     if let Some(left) = &node.left {
-        tree_to_file(left, file);
+        save_tree(left, object);
     } else {
-        file.write(&[32, 35]).unwrap();
+        object.write(&[32, 35]).unwrap();
     }
 
     if let Some(right) = &node.right {
-        tree_to_file(right, file);
+        save_tree(right, object);
     } else {
-        file.write(&[32, 35]).unwrap();
+        object.write(&[32, 35]).unwrap();
     }
 }
 
@@ -243,5 +243,16 @@ mod tests {
 
         assert_eq!(1, decode_element(&mut vec![0, 1], &node_root));
         assert_eq!(110, decode_element(&mut vec![1, 0], &node_root));
+    }
+
+    #[test]
+    fn test_save_tree() {
+        let node_root = example_tree();
+        let tree_saved_example = vec![0, 0, 1, 4, 0, 0, 1, 1, 0, 0, 0, 1, 110, 0, 0, 1, 32, 0, 0];
+
+        let mut tree_saved_from_fn = Vec::new();
+        save_tree(&node_root, &mut tree_saved_from_fn);
+
+        assert_eq!(tree_saved_example, tree_saved_from_fn);
     }
 }
