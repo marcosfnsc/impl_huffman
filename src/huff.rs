@@ -2,7 +2,7 @@ use std::{fs::File, io::Write};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Node {
-    elemento: Option<u8>,
+    element: Option<u8>,
     freq: usize,
     left: Option<Box<Node>>,
     right: Option<Box<Node>>,
@@ -11,14 +11,14 @@ pub struct Node {
 impl Node {
     fn new(elt: Option<u8>, frq: usize) -> Self {
         Self {
-            elemento: elt,
+            element: elt,
             freq: frq,
             left: None,
             right: None
         }
     }
     pub fn get_elt(&self) -> u8 {
-        self.elemento.unwrap()
+        self.element.unwrap()
     }
 
     pub fn get_freq(&self) -> usize {
@@ -63,7 +63,7 @@ pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
         let mut result_left = false;
         let mut result_right = false;
 
-        if let Some(n) = node.elemento {
+        if let Some(n) = node.element {
             if n == elt {
                 valid_path = true;
             }
@@ -90,7 +90,7 @@ pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
 }
 
 pub fn tree_to_file(node: &Node, file: &mut File) {
-    if let Some(c) = node.elemento {
+    if let Some(c) = node.element {
         file.write(&[c, 32]).unwrap();
     } else {
         file.write(&[32, 110]).unwrap();
