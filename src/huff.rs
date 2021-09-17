@@ -86,22 +86,22 @@ pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
 }
 
 pub fn save_tree(node: &Node, object: &mut impl Write) {
-    if let Some(c) = node.element {
-        object.write(&[c, 32]).unwrap();
+    if let Some(element) = node.element {
+        object.write(&[1, element]).unwrap();
     } else {
-        object.write(&[32, 110]).unwrap();
+        object.write(&[0]).unwrap();
     }
 
     if let Some(left) = &node.left {
         save_tree(left, object);
     } else {
-        object.write(&[32, 35]).unwrap();
+        object.write(&[0]).unwrap();
     }
 
     if let Some(right) = &node.right {
         save_tree(right, object);
     } else {
-        object.write(&[32, 35]).unwrap();
+        object.write(&[0]).unwrap();
     }
 }
 
