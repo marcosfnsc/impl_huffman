@@ -1,4 +1,3 @@
-use std::collections::VecDeque;
 use std::{fs::File, io::Write};
 
 #[derive(Clone, Debug, PartialEq)]
@@ -28,8 +27,8 @@ impl Node {
 }
 
 
-pub fn frequency(array: &mut Vec<u8>) -> VecDeque<Node> {
-    let mut array_nodes: VecDeque<Node> = VecDeque::new();
+pub fn frequency(array: &mut Vec<u8>) -> Vec<Node> {
+    let mut array_nodes = Vec::new();
     while array.len() != 0 {
         let elt = array[0];
 
@@ -37,23 +36,23 @@ pub fn frequency(array: &mut Vec<u8>) -> VecDeque<Node> {
         array.retain(|value| *value != elt);
         let freq = prev_len - array.len();
 
-        array_nodes.push_back(Node::new(Some(elt), freq));
+        array_nodes.push(Node::new(Some(elt), freq));
     }
     array_nodes
 }
 
-pub fn create_tree(array_nodes: &mut VecDeque<Node>) -> Node {
+pub fn create_tree(array_nodes: &mut Vec<Node>) -> Node {
     while array_nodes.len() > 1 {
-        array_nodes.make_contiguous().sort_by_key(|k| k.freq);
-        let node0 = array_nodes.pop_front().unwrap();
-        let node1 = array_nodes.pop_front().unwrap();
+        array_nodes.sort_by_key(|k| k.freq);
+        let node0 = array_nodes.remove(0);
+        let node1 = array_nodes.remove(0);
 
         let mut new_node = Node::new(None, node0.freq+node1.freq);
         new_node.left = Some(Box::new(node0));
         new_node.right = Some(Box::new(node1));
-        array_nodes.push_back(new_node);
+        array_nodes.push(new_node);
     }
-    array_nodes.pop_front().unwrap()
+    array_nodes.remove(0)
 }
 
 pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
@@ -171,12 +170,12 @@ pub fn decode_element(bits: &mut Vec<u8>, node: &Node) -> u8 {
 mod tests {
     use super::*;
 
-    fn example_array_nodes() -> VecDeque<Node> {
-        let mut v_node = VecDeque::new();
-        v_node.push_back(Node::new(Some(32),  3));
-        v_node.push_back(Node::new(Some(1),   2));
-        v_node.push_back(Node::new(Some(4),   1));
-        v_node.push_back(Node::new(Some(110), 2));
+    fn example_array_nodes() -> Vec<Node> {
+        let mut v_node = Vec::new();
+        v_node.push(Node::new(Some(32),  3));
+        v_node.push(Node::new(Some(1),   2));
+        v_node.push(Node::new(Some(4),   1));
+        v_node.push(Node::new(Some(110), 2));
         v_node
     }
 
@@ -209,6 +208,7 @@ mod tests {
     #[test]
     fn test_create_tree() {
         let mut v_node = example_array_nodes();
+        let mut v_node = Vec::from(v_node);
         let node_root = example_tree();
 
         assert_eq!(node_root, create_tree(&mut v_node));
