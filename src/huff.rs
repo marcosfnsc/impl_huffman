@@ -43,16 +43,16 @@ pub fn frequency(array: &mut Vec<u8>) -> Vec<Node> {
 
 pub fn create_tree(array_nodes: &mut Vec<Node>) -> Node {
     while array_nodes.len() > 1 {
-        array_nodes.sort_by_key(|k| k.freq);
-        let node0 = array_nodes.remove(0);
-        let node1 = array_nodes.remove(0);
+        array_nodes.sort_by(|a, b| b.freq.cmp(&a.freq));
+        let node0 = array_nodes.pop().unwrap();
+        let node1 = array_nodes.pop().unwrap();
 
         let mut new_node = Node::new(None, node0.freq+node1.freq);
         new_node.left = Some(Box::new(node0));
         new_node.right = Some(Box::new(node1));
         array_nodes.push(new_node);
     }
-    array_nodes.remove(0)
+    array_nodes.pop().unwrap()
 }
 
 pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
@@ -186,7 +186,6 @@ mod tests {
 
         assert_eq!(v_node, frequency(&mut v));
     }
-
     fn example_tree() -> Node {
         let node0 = Node::new(Some(1),   2);
         let node1 = Node::new(Some(110), 2);
@@ -205,11 +204,28 @@ mod tests {
         node6
     }
 
+    fn example_tree1() -> Node {
+        let node0 = Node::new(Some(1),   2);
+        let node1 = Node::new(Some(110), 2);
+        let node2 = Node::new(Some(32),  3);
+        let node3 = Node::new(Some(4),   1);
+
+        let mut node4 = Node::new(None, node3.freq+node1.freq);
+        node4.left  = Some(Box::new(node3));
+        node4.right = Some(Box::new(node1));
+        let mut node5 = Node::new(None, node0.freq+node4.freq);
+        node5.left  = Some(Box::new(node0));
+        node5.right = Some(Box::new(node4));
+        let mut node6 = Node::new(None, node2.freq+node5.freq);
+        node6.left  = Some(Box::new(node2));
+        node6.right = Some(Box::new(node5));
+        node6
+    }
+
     #[test]
     fn test_create_tree() {
         let mut v_node = example_array_nodes();
-        let mut v_node = Vec::from(v_node);
-        let node_root = example_tree();
+        let node_root = example_tree1();
 
         assert_eq!(node_root, create_tree(&mut v_node));
     }
