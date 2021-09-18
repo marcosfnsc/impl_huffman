@@ -86,10 +86,14 @@ pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
 }
 
 pub fn save_tree(node: &Node, object: &mut impl Write) {
+    // flags
+    // 1 - é uma folha, o valor seguinte é o valor dessa folha
+    // 2 - é um nó
+    // 0 - nulo, não existe qualquer nó
     if let Some(element) = node.element {
         object.write(&[1, element]).unwrap();
     } else {
-        object.write(&[0]).unwrap();
+        object.write(&[2]).unwrap();
     }
 
     if let Some(left) = &node.left {
@@ -106,50 +110,27 @@ pub fn save_tree(node: &Node, object: &mut impl Write) {
 }
 
 pub fn restore_tree(array: &mut Vec<u8>) -> Node {
-    fn file_to_tree(array: &mut Vec<u8>) -> Option<Node> {
-        if array[1] == 32 {
-            let mut node = Node::new(Some(array[0]), 0);
+    fn inner_fn(array: &mut Vec<u8>) -> Option<Box<Node>> {
+        if array[0] == 1 {
+            let mut node = Node::new(Some(array[1]), 0);
             array.drain(0..2);
+            node.left = inner_fn(array);
+            node.right = inner_fn(array);
 
-            let no0 = file_to_tree(array);
-            if let Some(n0) = no0 {
-                node.left = Some(Box::new(n0));
-            } else {
-                array.drain(0..2);
-            }
-
-            let no1 = file_to_tree(array);
-            if let Some(n1) = no1 {
-                node.right = Some(Box::new(n1));
-            } else {
-                array.drain(0..2);
-            }
-
-            return Some(node);
-
-        } else if array[1] == 110 {
+            Some(Box::new(node))
+        } else if array[0] == 2 {
             let mut node = Node::new(None, 0);
-            array.drain(0..2);
+            array.remove(0);
+            node.left = inner_fn(array);
+            node.right = inner_fn(array);
 
-            let no0 = file_to_tree(array);
-            if let Some(n0) = no0 {
-                node.left = Some(Box::new(n0));
-            } else {
-                array.drain(0..2);
-            }
-
-            let no1 = file_to_tree(array);
-            if let Some(n1) = no1 {
-                node.right = Some(Box::new(n1));
-            } else {
-                array.drain(0..2);
-            }
-
-            return Some(node);
+            Some(Box::new(node))
+        } else {
+            array.remove(0);
+            None
         }
-        None
     }
-    file_to_tree(array).unwrap()
+    *inner_fn(array).unwrap()
 }
 
 pub fn decode_element(bits: &mut Vec<u8>, node: &Node) -> u8 {
@@ -221,6 +202,24 @@ mod tests {
         node6
     }
 
+    fn example_tree_without_freq() -> Node {
+        let node0 = Node::new(Some(1),   0);
+        let node1 = Node::new(Some(110), 0);
+        let node2 = Node::new(Some(32),  0);
+        let node3 = Node::new(Some(4),   0);
+
+        let mut node4 = Node::new(None, node3.freq+node0.freq);
+        node4.left  = Some(Box::new(node3));
+        node4.right = Some(Box::new(node0));
+        let mut node5 = Node::new(None, node1.freq+node2.freq);
+        node5.left  = Some(Box::new(node1));
+        node5.right = Some(Box::new(node2));
+        let mut node6 = Node::new(None, node4.freq+node5.freq);
+        node6.left  = Some(Box::new(node4));
+        node6.right = Some(Box::new(node5));
+        node6
+    }
+
     #[test]
     fn test_create_tree() {
         let mut v_node = example_array_nodes();
@@ -251,7 +250,7 @@ mod tests {
     #[test]
     fn test_save_tree() {
         let node_root = example_tree();
-        let tree_saved_example = vec![0, 0, 1, 4, 0, 0, 1, 1, 0, 0, 0, 1, 110, 0, 0, 1, 32, 0, 0];
+        let tree_saved_example = vec![2, 2, 1, 4, 0, 0, 1, 1, 0, 0, 2, 1, 110, 0, 0, 1, 32, 0, 0];
 
         let mut tree_saved_from_fn = Vec::new();
         save_tree(&node_root, &mut tree_saved_from_fn);
@@ -261,8 +260,8 @@ mod tests {
 
     #[test]
     fn test_restore_tree() {
-        let mut tree_saved_example = vec![0, 0, 1, 4, 0, 0, 1, 1, 0, 0, 0, 1, 110, 0, 0, 1, 32, 0, 0];
-        let node_root = example_tree();
+        let mut tree_saved_example = vec![2, 2, 1, 4, 0, 0, 1, 1, 0, 0, 2, 1, 110, 0, 0, 1, 32, 0, 0];
+        let node_root = example_tree_without_freq();
 
         assert_eq!(node_root, restore_tree(&mut tree_saved_example));
     }
