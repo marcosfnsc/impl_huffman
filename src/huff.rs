@@ -105,48 +105,51 @@ pub fn save_tree(node: &Node, object: &mut impl Write) {
     }
 }
 
-pub fn file_to_tree(array: &mut Vec<u8>) -> Option<Node> {
-    if array[1] == 32 {
-        let mut node = Node::new(Some(array[0]), 0);
-        array.drain(0..2);
-
-        let no0 = file_to_tree(array);
-        if let Some(n0) = no0 {
-            node.left = Some(Box::new(n0));
-        } else {
+pub fn restore_tree(array: &mut Vec<u8>) -> Node {
+    fn file_to_tree(array: &mut Vec<u8>) -> Option<Node> {
+        if array[1] == 32 {
+            let mut node = Node::new(Some(array[0]), 0);
             array.drain(0..2);
-        }
 
-        let no1 = file_to_tree(array);
-        if let Some(n1) = no1 {
-            node.right = Some(Box::new(n1));
-        } else {
+            let no0 = file_to_tree(array);
+            if let Some(n0) = no0 {
+                node.left = Some(Box::new(n0));
+            } else {
+                array.drain(0..2);
+            }
+
+            let no1 = file_to_tree(array);
+            if let Some(n1) = no1 {
+                node.right = Some(Box::new(n1));
+            } else {
+                array.drain(0..2);
+            }
+
+            return Some(node);
+
+        } else if array[1] == 110 {
+            let mut node = Node::new(None, 0);
             array.drain(0..2);
+
+            let no0 = file_to_tree(array);
+            if let Some(n0) = no0 {
+                node.left = Some(Box::new(n0));
+            } else {
+                array.drain(0..2);
+            }
+
+            let no1 = file_to_tree(array);
+            if let Some(n1) = no1 {
+                node.right = Some(Box::new(n1));
+            } else {
+                array.drain(0..2);
+            }
+
+            return Some(node);
         }
-
-        return Some(node);
-
-    } else if array[1] == 110 {
-        let mut node = Node::new(None, 0);
-        array.drain(0..2);
-
-        let no0 = file_to_tree(array);
-        if let Some(n0) = no0 {
-            node.left = Some(Box::new(n0));
-        } else {
-            array.drain(0..2);
-        }
-
-        let no1 = file_to_tree(array);
-        if let Some(n1) = no1 {
-            node.right = Some(Box::new(n1));
-        } else {
-            array.drain(0..2);
-        }
-
-        return Some(node);
+        None
     }
-    None
+    file_to_tree(array).unwrap()
 }
 
 pub fn decode_element(bits: &mut Vec<u8>, node: &Node) -> u8 {
@@ -254,5 +257,13 @@ mod tests {
         save_tree(&node_root, &mut tree_saved_from_fn);
 
         assert_eq!(tree_saved_example, tree_saved_from_fn);
+    }
+
+    #[test]
+    fn test_restore_tree() {
+        let mut tree_saved_example = vec![0, 0, 1, 4, 0, 0, 1, 1, 0, 0, 0, 1, 110, 0, 0, 1, 32, 0, 0];
+        let node_root = example_tree();
+
+        assert_eq!(node_root, restore_tree(&mut tree_saved_example));
     }
 }
