@@ -1,5 +1,6 @@
 use std::env;
 use std::fs;
+use std::io::Write;
 
 mod huff;
 mod utils;
@@ -22,17 +23,16 @@ fn main() {
     } else if args.len() == 4 && args[1] == "-c" && args[2] == "-f" {
         //compress
 
-        /*
         let array_file = fs::read(&args[3]).unwrap();
         let mut array_nodes = huff::frequency(&mut array_file.clone());
         let node_root = huff::create_tree(&mut array_nodes);
 
         let mut file = fs::File::create(args[3].clone()+".huff").unwrap();
-        huff::tree_to_file(&node_root, &mut file);
+        huff::save_tree(&node_root, &mut file);
 
         let mut bytes = Vec::new();
         for byte in array_file {
-            let mut new_byte = huff::encode_elt(byte, &node_root);
+            let mut new_byte = huff::encode_element(byte, &node_root);
             bytes.append(&mut new_byte);
         }
 
@@ -53,14 +53,12 @@ fn main() {
             file.write(&[utils::bitvec_to_decimal(&bytes[0..8])]).unwrap();
             bytes.drain(0..8);
         }
-        */
 
     } else if  args.len() == 4 && args[1] == "-d" && args[2] == "-f" {
         // descompress
 
-        /*
         let mut array_file = fs::read(&args[3]).unwrap();
-        let node_root = huff::file_to_tree(&mut array_file).unwrap();
+        let node_root = huff::restore_tree(&mut array_file);
 
         let residual = array_file.remove(0);
         let mut array_file_converted = {
@@ -74,9 +72,8 @@ fn main() {
         let mut file = fs::File::create(&args[3][..args[3].len()-5]).unwrap();
 
         while array_file_converted.len() != 0 {
-            file.write(&[huff::decode_elt(&mut array_file_converted, &node_root)]).unwrap();
+            file.write(&[huff::decode_element(&mut array_file_converted, &node_root)]).unwrap();
         }
-        */
 
     } else if  args.len() == 4 && args[1] == "-s" && args[2] == "-f" {
         // tabela de simbolos
