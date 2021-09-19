@@ -90,22 +90,17 @@ pub fn save_tree(node: &Node, object: &mut impl Write) {
     // 1 - é uma folha, o valor seguinte é o valor dessa folha
     // 2 - é um nó
     // 0 - nulo, não existe qualquer nó
-    if let Some(element) = node.element {
-        object.write(&[1, element]).unwrap();
-    } else {
-        object.write(&[2]).unwrap();
+    match node.element {
+        Some(element) => {object.write(&[1, element]).unwrap();},
+        None          => {object.write(&[2]).unwrap();}
     }
-
-    if let Some(left) = &node.left {
-        save_tree(left, object);
-    } else {
-        object.write(&[0]).unwrap();
+    match &node.left {
+        Some(left) => {save_tree(left, object);},
+        None       => {object.write(&[0]).unwrap();}
     }
-
-    if let Some(right) = &node.right {
-        save_tree(right, object);
-    } else {
-        object.write(&[0]).unwrap();
+    match &node.right {
+        Some(right) => {save_tree(right, object);},
+        None        => {object.write(&[0]).unwrap();}
     }
 }
 
