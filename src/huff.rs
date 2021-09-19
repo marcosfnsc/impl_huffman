@@ -111,26 +111,26 @@ pub fn save_tree(node: &Node, object: &mut impl Write) {
 
 pub fn restore_tree(array: &mut Vec<u8>) -> Node {
     fn inner_fn(array: &mut Vec<u8>) -> Option<Box<Node>> {
-        if array[0] == 1 {
-            let mut node = Node::new(Some(array[1]), 0);
-            array.drain(0..2);
-            node.left = inner_fn(array);
-            node.right = inner_fn(array);
-
-            Some(Box::new(node))
-        } else if array[0] == 2 {
-            let mut node = Node::new(None, 0);
-            array.remove(0);
-            node.left = inner_fn(array);
-            node.right = inner_fn(array);
-
-            Some(Box::new(node))
-        } else {
-            array.remove(0);
-            None
+        match array.pop().unwrap() {
+            1 => {
+                let mut node = Node::new(Some(array.pop().unwrap()), 0);
+                node.left  = inner_fn(array);
+                node.right = inner_fn(array);
+                Some(Box::new(node))
+            },
+            2 => {
+                let mut node = Node::new(None, 0);
+                node.left  = inner_fn(array);
+                node.right = inner_fn(array);
+                Some(Box::new(node))
+            },
+            _ => None
         }
     }
-    *inner_fn(array).unwrap()
+    array.reverse();
+    let tree = *inner_fn(array).unwrap();
+    array.reverse();
+    tree
 }
 
 pub fn decode_element(bits: &mut Vec<u8>, node: &Node) -> u8 {
