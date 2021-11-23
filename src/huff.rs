@@ -85,7 +85,7 @@ pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
     bits
 }
 
-pub fn save_tree(node: &Node, object: &mut impl Write) {
+pub fn save_tree<T: Write>(node: &Node, object: &mut T) {
     // flags
     // 1 - é uma folha, o valor seguinte é o valor dessa folha
     // 2 - é um nó
