@@ -13,10 +13,11 @@ pub fn bitvec_to_decimal(v: &[u8]) -> u8 {
     decimal
 }
 
-pub fn decimal_to_bitvec(decimal: u8) -> Vec<u8> {
+pub fn decimal_to_bitvec(decimal: u8) -> [u8;8] {
     let mut decimal = decimal;
-    let mut bitvec: Vec<u8> = Vec::with_capacity(8);
+    let mut bit_array: [u8;8] = [0;8];
 
+    let mut idx = bit_array.len()-1;
     while decimal > 1 {
         let rest = decimal % 2;
         if rest == 1 {
@@ -24,15 +25,18 @@ pub fn decimal_to_bitvec(decimal: u8) -> Vec<u8> {
         } else {
             decimal /= 2;
         }
-        bitvec.insert(0, rest);
+        bit_array[idx] = rest;
+        idx -= 1;
     }
-    bitvec.insert(0, decimal);
+    bit_array[idx] = decimal;
+    idx -= 1;
 
-    while bitvec.len() < 8 {
-        bitvec.insert(0, 0);
+    while idx > 0 {
+        bit_array[idx] = 0;
+        idx -= 1;
     }
 
-    bitvec
+    bit_array
 }
 
 #[cfg(test)]
@@ -49,9 +53,9 @@ mod tests {
 
     #[test]
     fn test_decimal_to_binary() {
-        assert_eq!(vec![0, 0, 0, 0, 0, 0, 1, 0], decimal_to_bitvec(2));
-        assert_eq!(vec![0, 0, 0, 0, 1, 0, 0, 0], decimal_to_bitvec(8));
-        assert_eq!(vec![0, 0, 0, 1, 0, 0, 0, 1], decimal_to_bitvec(17));
-        assert_eq!(vec![0, 0, 1, 0, 1, 0, 1, 0], decimal_to_bitvec(42));
+        assert_eq!([0, 0, 0, 0, 0, 0, 1, 0], decimal_to_bitvec(2));
+        assert_eq!([0, 0, 0, 0, 1, 0, 0, 0], decimal_to_bitvec(8));
+        assert_eq!([0, 0, 0, 1, 0, 0, 0, 1], decimal_to_bitvec(17));
+        assert_eq!([0, 0, 1, 0, 1, 0, 1, 0], decimal_to_bitvec(42));
     }
 }

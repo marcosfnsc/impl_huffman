@@ -64,7 +64,7 @@ fn main() {
         let mut array_file_converted = {
             let mut bitvec = Vec::new();
             for byte in array_file {
-                bitvec.append(&mut utils::decimal_to_bitvec(byte));
+                bitvec.extend_from_slice(&utils::decimal_to_bitvec(byte));
             }
             bitvec
         };
