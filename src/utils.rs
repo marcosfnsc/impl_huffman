@@ -13,9 +13,9 @@ pub fn bitvec_to_decimal(v: &[u8]) -> u8 {
     decimal
 }
 
-pub fn decimal_to_bitvec(decimal: u8) -> [u8;8] {
+pub fn decimal_to_bitvec(decimal: u8) -> [u8; 8] {
     let mut decimal = decimal;
-    let mut bit_array: [u8;8] = [0;8];
+    let mut bit_array = [0u8; 8];
 
     let mut idx = bit_array.len()-1;
     while decimal > 1 {
