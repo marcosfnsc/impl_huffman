@@ -1,6 +1,6 @@
 use std::env;
 use std::fs;
-use std::io::Write;
+use std::io::{BufWriter, Write};
 
 mod huff;
 mod utils;
@@ -27,7 +27,7 @@ fn main() {
         let mut array_nodes = huff::frequency(&mut array_file.clone());
         let node_root = huff::create_tree(&mut array_nodes);
 
-        let mut file = fs::File::create(args[3].clone()+".huff").unwrap();
+        let mut file = BufWriter::new(fs::File::create(args[3].clone()+".huff").unwrap());
         huff::save_tree(&node_root, &mut file);
 
         let mut bytes = Vec::new();
