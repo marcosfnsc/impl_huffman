@@ -29,13 +29,6 @@ pub fn decimal_to_bitvec(decimal: u8) -> [u8; 8] {
         idx -= 1;
     }
     bit_array[idx] = decimal;
-    idx -= 1;
-
-    while idx > 0 {
-        bit_array[idx] = 0;
-        idx -= 1;
-    }
-
     bit_array
 }
 
@@ -57,5 +50,6 @@ mod tests {
         assert_eq!([0, 0, 0, 0, 1, 0, 0, 0], decimal_to_bitvec(8));
         assert_eq!([0, 0, 0, 1, 0, 0, 0, 1], decimal_to_bitvec(17));
         assert_eq!([0, 0, 1, 0, 1, 0, 1, 0], decimal_to_bitvec(42));
+        assert_eq!([1, 1, 0, 0, 0, 0, 0, 0], decimal_to_bitvec(192));
     }
 }
