@@ -1,4 +1,5 @@
 use std::io::Write;
+use std::collections::HashMap;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Node {
@@ -27,18 +28,14 @@ impl Node {
 }
 
 
-pub fn frequency(array: &mut Vec<u8>) -> Vec<Node> {
-    let mut array_nodes = Vec::new();
-    while array.len() != 0 {
-        let elt = array[0];
+pub fn frequency(array: &[u8]) -> HashMap<&u8, usize> {
+    let mut h_map = HashMap::new();
 
-        let prev_len = array.len();
-        array.retain(|value| *value != elt);
-        let freq = prev_len - array.len();
-
-        array_nodes.push(Node::new(Some(elt), freq));
+    for byte in array {
+        let counter = h_map.entry(byte).or_insert(0 as usize);
+        *counter += 1;
     }
-    array_nodes
+    h_map
 }
 
 pub fn create_tree(array_nodes: &mut Vec<Node>) -> Node {
@@ -132,11 +129,9 @@ pub fn decode_element(bits: &mut Vec<u8>, node: &Node) -> u8 {
     if node.left.is_none() && node.right.is_none() {
         return node.get_elt();
     }
-    if bits[0] == 0 {
-        bits.remove(0);
+    if bits.pop().unwrap() == 0 {
         return decode_element(bits, node.left.as_ref().unwrap());
     } else {
-        bits.remove(0);
         return decode_element(bits, node.right.as_ref().unwrap());
     }
 }
@@ -238,8 +233,12 @@ mod tests {
     fn test_decode_element() {
         let node_root = example_tree();
 
-        assert_eq!(1, decode_element(&mut vec![0, 1], &node_root));
-        assert_eq!(110, decode_element(&mut vec![1, 0], &node_root));
+        let mut v_test = vec![0, 1];
+        v_test.reverse();
+        assert_eq!(1, decode_element(&mut v_test, &node_root));
+        let mut v_test = vec![1, 0];
+        v_test.reverse();
+        assert_eq!(110, decode_element(&mut v_test, &node_root));
     }
 
     #[test]
