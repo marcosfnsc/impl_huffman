@@ -9,6 +9,31 @@ pub struct Node {
     right: Option<Box<Node>>,
 }
 
+enum Tree {
+    Node {
+        left: Box<Tree>,
+        right: Box<Tree>,
+        freq: usize
+    },
+    Leaf {
+        element: u8,
+        freq: usize
+    }
+}
+
+impl Tree {
+    fn new_leaf(element: u8, freq: usize) -> Tree {
+        Self::Leaf { element, freq }
+    }
+
+    fn get_freq(&self) -> usize {
+        match self {
+            &Tree::Leaf { freq, .. } => freq,
+            &Tree::Node { freq, .. } => freq,
+        }
+    }
+}
+
 impl Node {
     fn new(elt: Option<u8>, frq: usize) -> Self {
         Self {
@@ -38,18 +63,31 @@ pub fn frequency(array: &[u8]) -> HashMap<&u8, usize> {
     h_map
 }
 
-pub fn create_tree(array_nodes: &mut Vec<Node>) -> Node {
-    while array_nodes.len() > 1 {
-        array_nodes.sort_by(|a, b| b.freq.cmp(&a.freq));
-        let node0 = array_nodes.pop().unwrap();
-        let node1 = array_nodes.pop().unwrap();
-
-        let mut new_node = Node::new(None, node0.freq+node1.freq);
-        new_node.left = Some(Box::new(node0));
-        new_node.right = Some(Box::new(node1));
-        array_nodes.push(new_node);
+pub fn create_tree(elements: &HashMap<&u8, usize>) -> Tree {
+    let mut nodes = Vec::with_capacity(elements.len());
+    for (k, v) in elements {
+        nodes.push(Tree::new_leaf(**k, *v));
     }
-    array_nodes.pop().unwrap()
+
+    fn tree(nodes: &mut Vec<Tree>) {
+        if nodes.len() > 1 {
+            nodes.sort_by(|a, b| b.get_freq().cmp(&a.get_freq()));
+            let node0 = nodes.pop().unwrap();
+            let node1 = nodes.pop().unwrap();
+
+            let root = Tree::Node {
+                left: Box::new(node0),
+                right: Box::new(node1),
+                freq: node0.get_freq() + node1.get_freq()
+            };
+            nodes.push(root);
+
+            tree(nodes);
+        }
+    }
+
+    tree(&mut nodes);
+    nodes.pop().unwrap()
 }
 
 pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
@@ -82,22 +120,19 @@ pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
     bits
 }
 
-pub fn save_tree<T: Write>(node: &Node, object: &mut T) {
+pub fn save_tree<T: Write>(node: &Tree, object: &mut T) {
     // flags
     // 1 - é uma folha, o valor seguinte é o valor dessa folha
     // 2 - é um nó
     // 0 - nulo, não existe qualquer nó
-    match node.element {
-        Some(element) => {object.write(&[1, element]).unwrap();},
-        None          => {object.write(&[2]).unwrap();}
-    }
-    match &node.left {
-        Some(left) => {save_tree(left, object);},
-        None       => {object.write(&[0]).unwrap();}
-    }
-    match &node.right {
-        Some(right) => {save_tree(right, object);},
-        None        => {object.write(&[0]).unwrap();}
+
+    match node {
+        Tree::Leaf {element, .. } => {object.write(&[1, *element]).unwrap();},
+        Tree::Node {left, right, ..} => {
+            object.write(&[2]).unwrap();
+            save_tree(left, object);
+            save_tree(right, object);
+        }
     }
 }
 
@@ -136,6 +171,7 @@ pub fn decode_element(bits: &mut Vec<u8>, node: &Node) -> u8 {
     }
 }
 
+/*
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -260,3 +296,4 @@ mod tests {
         assert_eq!(node_root, restore_tree(&mut tree_saved_example));
     }
 }
+*/

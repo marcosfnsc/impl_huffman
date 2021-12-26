@@ -24,10 +24,11 @@ fn main() {
         //compress
 
         let array_file = fs::read(&args[3]).unwrap();
-        let mut array_nodes = huff::frequency(&mut array_file.clone());
-        let node_root = huff::create_tree(&mut array_nodes);
+        let frequency = huff::frequency(&array_file);
+        let node_root = huff::create_tree(&frequency);
 
-        let mut file = BufWriter::new(fs::File::create(args[3].clone()+".huff").unwrap());
+        //let mut file = BufWriter::new(fs::File::create(args[3].clone()+".huff").unwrap());
+        let mut file = fs::File::create(args[3].clone()+".huff").unwrap();
         huff::save_tree(&node_root, &mut file);
 
         let mut bytes = Vec::new();
@@ -46,12 +47,15 @@ fn main() {
 
         file.write(&[residual as u8]).unwrap();
         for _ in 0..residual {
-            bytes.insert(0, 0);
+            bytes.push(0);
         }
 
-        while bytes.len() > 1 {
-            file.write(&[utils::bitvec_to_decimal(&bytes[0..8])]).unwrap();
-            bytes.drain(0..8);
+        let mut idx_begin = 0;
+        let mut idx_last = 8;
+        while bytes.len()-1 > idx_last {
+            file.write(&[utils::bitvec_to_decimal(&bytes[idx_begin..idx_last])]).unwrap();
+            idx_begin += 8;
+            idx_last += 8;
         }
 
     } else if  args.len() == 4 && args[1] == "-d" && args[2] == "-f" {
@@ -71,6 +75,7 @@ fn main() {
         array_file_converted.drain(0..residual as usize);
         let mut file = fs::File::create(&args[3][..args[3].len()-5]).unwrap();
 
+        array_file_converted.reverse();
         while array_file_converted.len() != 0 {
             file.write(&[huff::decode_element(&mut array_file_converted, &node_root)]).unwrap();
         }
