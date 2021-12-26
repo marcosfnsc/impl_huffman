@@ -1,15 +1,7 @@
 use std::io::Write;
 use std::collections::HashMap;
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct Node {
-    element: Option<u8>,
-    freq: usize,
-    left: Option<Box<Node>>,
-    right: Option<Box<Node>>,
-}
-
-enum Tree {
+pub enum Tree {
     Node {
         left: Box<Tree>,
         right: Box<Tree>,
@@ -22,7 +14,7 @@ enum Tree {
 }
 
 impl Tree {
-    fn new_leaf(element: u8, freq: usize) -> Tree {
+    pub fn new_leaf(element: u8, freq: usize) -> Tree {
         Self::Leaf { element, freq }
     }
 
@@ -33,25 +25,6 @@ impl Tree {
         }
     }
 }
-
-impl Node {
-    fn new(elt: Option<u8>, frq: usize) -> Self {
-        Self {
-            element: elt,
-            freq: frq,
-            left: None,
-            right: None
-        }
-    }
-    pub fn get_elt(&self) -> u8 {
-        self.element.unwrap()
-    }
-
-    pub fn get_freq(&self) -> usize {
-        self.freq
-    }
-}
-
 
 pub fn frequency(array: &[u8]) -> HashMap<&u8, usize> {
     let mut h_map = HashMap::new();
@@ -76,9 +49,9 @@ pub fn create_tree(elements: &HashMap<&u8, usize>) -> Tree {
             let node1 = nodes.pop().unwrap();
 
             let root = Tree::Node {
+                freq: node0.get_freq() + node1.get_freq(),
                 left: Box::new(node0),
                 right: Box::new(node1),
-                freq: node0.get_freq() + node1.get_freq()
             };
             nodes.push(root);
 
@@ -90,29 +63,24 @@ pub fn create_tree(elements: &HashMap<&u8, usize>) -> Tree {
     nodes.pop().unwrap()
 }
 
-pub fn encode_element(elt: u8, node: &Node) -> Vec<u8> {
+pub fn encode_element(elt: u8, node: &Tree) -> Vec<u8> {
     let mut bits = Vec::new();
 
-    fn walk_through_tree(element: u8, node: &Node, bits: &mut Vec<u8>) -> bool {
-        let mut result_left = false;
-        let mut result_right = false;
-
-        if matches!(node.element, Some(n) if n == element) {
-            true
-        } else {
-            if let Some(left) = &node.left {
-                result_left = walk_through_tree(element, left, bits);
+    fn walk_through_tree(element: u8, node: &Tree, bits: &mut Vec<u8>) -> bool {
+        match node {
+            Tree::Leaf { .. } => true,
+            Tree::Node { left, right, .. } => {
+                let result_left = walk_through_tree(element, left, bits);
                 if result_left {
                     bits.push(0);
                 }
-            }
-            if let Some(right) = &node.right {
-                result_right = walk_through_tree(element, right, bits);
+
+                let result_right = walk_through_tree(element, right, bits);
                 if result_right {
                     bits.push(1);
                 }
+                result_left || result_right
             }
-            result_left || result_right
         }
     }
     walk_through_tree(elt, node, &mut bits);

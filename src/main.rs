@@ -83,14 +83,14 @@ fn main() {
     } else if  args.len() == 4 && args[1] == "-s" && args[2] == "-f" {
         // tabela de simbolos
 
-        let mut array_file = fs::read(&args[3]).unwrap();
-        let array_nodes = huff::frequency(&mut array_file);
-        let node_root = huff::create_tree(&mut array_nodes.clone());
+        let array_file = fs::read(&args[3]).unwrap();
+        let array_nodes = huff::frequency(&array_file);
+        let node_root = huff::create_tree(&array_nodes);
 
         println!("Simbolo | Freq. Abs. | Freq. Rel | Cod. ASCII | Cod. Huffman");
-        for node in &array_nodes {
+        for (key, value) in array_nodes {
 
-            match node.get_elt() {
+            match key {
                 0   => print!("{:<10}", "NULL"),
                 8   => print!("{:<10}", "BACKSPACE"),
                 9   => print!("{:<10}", "TAB"),
@@ -99,15 +99,15 @@ fn main() {
                 27  => print!("{:<10}", "ESC"),
                 32  => print!("{:<10}", "SPACE"),
                 127 => print!("{:<10}", "DEL"),
-                _   => print!("{:<10}", node.get_elt() as char)
+                _   => print!("{:<10}", *key as char)
             }
 
             print!("{:<12} {:<11} {:<11} {}",
-                     node.get_freq(),
-                     node.get_freq(),
-                     node.get_elt(),
+                     value,
+                     value,
+                     key,
                      " ");
-            for bit in huff::encode_element(node.get_elt(), &node_root) {
+            for bit in huff::encode_element(*key, &node_root) {
                 print!("{}", bit)
             }
             println!(""); // pular linha
