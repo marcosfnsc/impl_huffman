@@ -1,5 +1,5 @@
-use std::io::Write;
 use std::collections::HashMap;
+use std::io::Write;
 
 pub enum Tree {
     Node {
@@ -88,45 +88,36 @@ pub fn encode_element(elt: u8, node: &Tree) -> Vec<u8> {
     bits
 }
 
-pub fn save_tree<T: Write>(node: &Tree, object: &mut T) {
+pub fn save_tree<T: Write>(node: &Tree, writer: &mut T) {
     // flags
     // 1 - é uma folha, o valor seguinte é o valor dessa folha
     // 2 - é um nó
-    // 0 - nulo, não existe qualquer nó
 
     match node {
-        Tree::Leaf {element, .. } => {object.write(&[1, *element]).unwrap();},
+        Tree::Leaf {element, .. } => {writer.write(&[1, *element]).unwrap();},
         Tree::Node {left, right, ..} => {
-            object.write(&[2]).unwrap();
-            save_tree(left, object);
-            save_tree(right, object);
+            writer.write(&[2]).unwrap();
+            save_tree(left, writer);
+            save_tree(right, writer);
         }
     }
 }
 
-/*
-pub fn restore_tree(array: &mut Vec<u8>) -> Node {
-    fn inner_fn(array: &mut Vec<u8>) -> Option<Box<Node>> {
-        match array.pop().unwrap() {
-            1 => {
-                let mut node = Node::new(Some(array.pop().unwrap()), 0);
-                node.left  = inner_fn(array);
-                node.right = inner_fn(array);
-                Some(Box::new(node))
-            },
-            2 => {
-                let mut node = Node::new(None, 0);
-                node.left  = inner_fn(array);
-                node.right = inner_fn(array);
-                Some(Box::new(node))
-            },
-            _ => None
-        }
+pub fn restore_tree<'a, I>(array: I) -> Tree 
+where
+    I: Iterator<Item = &'a u8>
+{
+    match array.next().unwrap() {
+        1 => Tree::Leaf {
+                element: *array.next().unwrap(),
+                freq: 0
+        },
+        2 => Tree::Node {
+                left: Box::new(restore_tree(array)),
+                right: Box::new(restore_tree(array)),
+                freq: 0
+        },
     }
-    array.reverse();
-    let tree = *inner_fn(array).unwrap();
-    array.reverse();
-    tree
 }
 
 pub fn decode_element(bits: &mut Vec<u8>, node: &Node) -> u8 {
@@ -139,7 +130,6 @@ pub fn decode_element(bits: &mut Vec<u8>, node: &Node) -> u8 {
         return decode_element(bits, node.right.as_ref().unwrap());
     }
 }
-*/
 
 #[cfg(test)]
 mod tests {

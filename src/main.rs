@@ -60,9 +60,8 @@ fn main() {
     } else if  args.len() == 4 && args[1] == "-d" && args[2] == "-f" {
         // descompress
 
-        /*
         let mut array_file = fs::read(&args[3]).unwrap();
-        let node_root = huff::restore_tree(&mut array_file);
+        let node_root = huff::restore_tree(array_file.iter());
 
         let residual = array_file.remove(0);
         let mut array_file_converted = {
@@ -79,7 +78,6 @@ fn main() {
         while array_file_converted.len() != 0 {
             file.write(&[huff::decode_element(&mut array_file_converted, &node_root)]).unwrap();
         }
-        */
 
     } else if  args.len() == 4 && args[1] == "-s" && args[2] == "-f" {
         // tabela de simbolos
