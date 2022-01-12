@@ -103,7 +103,7 @@ pub fn save_tree<T: Write>(node: &Tree, writer: &mut T) {
     }
 }
 
-pub fn restore_tree<'a, I>(array: I) -> Tree 
+pub fn restore_tree<'a, I>(array: I) -> Tree
 where
     I: Iterator<Item = &'a u8>
 {
@@ -120,14 +120,19 @@ where
     }
 }
 
-pub fn decode_element(bits: &mut Vec<u8>, node: &Node) -> u8 {
-    if node.left.is_none() && node.right.is_none() {
-        return node.get_elt();
-    }
-    if bits.pop().unwrap() == 0 {
-        return decode_element(bits, node.left.as_ref().unwrap());
-    } else {
-        return decode_element(bits, node.right.as_ref().unwrap());
+pub fn decode_element<'a, I>(bits: I, node: &Tree) -> u8
+where
+    I: Iterator<Item = &'a u8>
+{
+    match node {
+        Tree::Leaf { element, .. } => *element,
+        Tree::Node { left, right, .. } => {
+            if *bits.next().unwrap() == 0 {
+                decode_element(bits, left)
+            } else {
+                decode_element(bits, right)
+            }
+        }
     }
 }
 
