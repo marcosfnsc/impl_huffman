@@ -12,7 +12,10 @@ fn menu() {
     println!("-h {:>10} Mostra este texto de ajuda", " ");
     println!("-c {:>10} Realiza a compressão", " ");
     println!("-d {:>10} Realiza a descompressão", " ");
-    println!("-s {:>10} Realiza apenas a análise de frequência e imprime a tabela de símbolos", " ");
+    println!(
+        "-s {:>10} Realiza apenas a análise de frequência e imprime a tabela de símbolos",
+        " "
+    );
     println!("-f <file> {:>3} Indica o arquivo a ser processado (comprimido, descomprimido ou para apresentar a tabela de símbolos)", " ");
 }
 
@@ -27,7 +30,7 @@ fn main() {
         let frequency = huff::frequency(&array_file);
         let node_root = huff::create_tree(&frequency);
 
-        let mut file = BufWriter::new(fs::File::create(args[3].clone()+".huff").unwrap());
+        let mut file = BufWriter::new(fs::File::create(args[3].clone() + ".huff").unwrap());
         huff::save_tree(&node_root, &mut file);
 
         let mut bytes = Vec::new();
@@ -51,13 +54,13 @@ fn main() {
 
         let mut idx_begin = 0;
         let mut idx_last = 8;
-        while bytes.len()-1 > idx_last {
-            file.write(&[utils::bitvec_to_decimal(&bytes[idx_begin..idx_last])]).unwrap();
+        while bytes.len() - 1 > idx_last {
+            file.write(&[utils::bitvec_to_decimal(&bytes[idx_begin..idx_last])])
+                .unwrap();
             idx_begin += 8;
             idx_last += 8;
         }
-
-    } else if  args.len() == 4 && args[1] == "-d" && args[2] == "-f" {
+    } else if args.len() == 4 && args[1] == "-d" && args[2] == "-f" {
         // descompress
 
         let mut array_file = fs::read(&args[3]).unwrap();
@@ -72,18 +75,16 @@ fn main() {
             bitvec
         };
         array_file_converted.drain(0..residual as usize);
-        let mut file = fs::File::create(&args[3][..args[3].len()-5]).unwrap();
+        let mut file = fs::File::create(&args[3][..args[3].len() - 5]).unwrap();
 
         while array_file_converted.len() != 0 {
-            file.write(&[huff::decode_element(&mut array_file_converted, &node_root)]).unwrap();
+            file.write(&[huff::decode_element(&mut array_file_converted, &node_root)])
+                .unwrap();
         }
 
         let array_iter = array_file_converted.iter();
-        while array_iter.pe  {
-            
-        }
-
-    } else if  args.len() == 4 && args[1] == "-s" && args[2] == "-f" {
+        while array_iter.pe {}
+    } else if args.len() == 4 && args[1] == "-s" && args[2] == "-f" {
         // tabela de simbolos
 
         let array_file = fs::read(&args[3]).unwrap();
@@ -92,24 +93,19 @@ fn main() {
 
         println!("Simbolo | Freq. Abs. | Freq. Rel | Cod. ASCII | Cod. Huffman");
         for (key, value) in array_nodes {
-
             match key {
-                0   => print!("{:<10}", "NULL"),
-                8   => print!("{:<10}", "BACKSPACE"),
-                9   => print!("{:<10}", "TAB"),
-                10  => print!("{:<10}", "\\n"),
-                11  => print!("{:<10}", "VTAB"),
-                27  => print!("{:<10}", "ESC"),
-                32  => print!("{:<10}", "SPACE"),
+                0 => print!("{:<10}", "NULL"),
+                8 => print!("{:<10}", "BACKSPACE"),
+                9 => print!("{:<10}", "TAB"),
+                10 => print!("{:<10}", "\\n"),
+                11 => print!("{:<10}", "VTAB"),
+                27 => print!("{:<10}", "ESC"),
+                32 => print!("{:<10}", "SPACE"),
                 127 => print!("{:<10}", "DEL"),
-                _   => print!("{:<10}", *key as char)
+                _ => print!("{:<10}", *key as char),
             }
 
-            print!("{:<12} {:<11} {:<11} {}",
-                     value,
-                     value,
-                     key,
-                     " ");
+            print!("{:<12} {:<11} {:<11} {}", value, value, key, " ");
             for bit in huff::encode_element(*key, &node_root) {
                 print!("{}", bit)
             }

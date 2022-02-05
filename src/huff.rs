@@ -5,12 +5,12 @@ pub enum Tree {
     Node {
         left: Box<Tree>,
         right: Box<Tree>,
-        freq: usize
+        freq: usize,
     },
     Leaf {
         element: u8,
-        freq: usize
-    }
+        freq: usize,
+    },
 }
 
 impl Tree {
@@ -68,7 +68,7 @@ pub fn encode_element(elt: u8, node: &Tree) -> Vec<u8> {
 
     fn walk_through_tree(element_target: u8, node: &Tree, bits: &mut Vec<u8>) -> bool {
         match node {
-            Tree::Leaf { element, .. } => {*element == element_target},
+            Tree::Leaf { element, .. } => *element == element_target,
             Tree::Node { left, right, .. } => {
                 let result_left = walk_through_tree(element_target, left, bits);
                 if result_left {
@@ -94,8 +94,10 @@ pub fn save_tree<T: Write>(node: &Tree, writer: &mut T) {
     // 2 - é um nó
 
     match node {
-        Tree::Leaf {element, .. } => {writer.write(&[1, *element]).unwrap();},
-        Tree::Node {left, right, ..} => {
+        Tree::Leaf { element, .. } => {
+            writer.write(&[1, *element]).unwrap();
+        }
+        Tree::Node { left, right, .. } => {
             writer.write(&[2]).unwrap();
             save_tree(left, writer);
             save_tree(right, writer);
@@ -105,24 +107,24 @@ pub fn save_tree<T: Write>(node: &Tree, writer: &mut T) {
 
 pub fn restore_tree<'a, I>(array: I) -> Tree
 where
-    I: Iterator<Item = &'a u8>
+    I: Iterator<Item = &'a u8>,
 {
     match array.next().unwrap() {
         1 => Tree::Leaf {
-                element: *array.next().unwrap(),
-                freq: 0
+            element: *array.next().unwrap(),
+            freq: 0,
         },
         2 => Tree::Node {
-                left: Box::new(restore_tree(array)),
-                right: Box::new(restore_tree(array)),
-                freq: 0
+            left: Box::new(restore_tree(array)),
+            right: Box::new(restore_tree(array)),
+            freq: 0,
         },
     }
 }
 
 pub fn decode_element<'a, I>(bits: I, node: &Tree) -> u8
 where
-    I: Iterator<Item = &'a u8>
+    I: Iterator<Item = &'a u8>,
 {
     match node {
         Tree::Leaf { element, .. } => *element,

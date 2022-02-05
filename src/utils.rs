@@ -17,11 +17,11 @@ pub fn decimal_to_bitvec(decimal: u8) -> [u8; 8] {
     let mut decimal = decimal;
     let mut bit_array = [0u8; 8];
 
-    let mut idx = bit_array.len()-1;
+    let mut idx = bit_array.len() - 1;
     while decimal > 1 {
         let rest = decimal % 2;
         if rest == 1 {
-            decimal = (decimal-1)/2;
+            decimal = (decimal - 1) / 2;
         } else {
             decimal /= 2;
         }
@@ -38,9 +38,9 @@ mod tests {
 
     #[test]
     fn test_bitvec_to_decinal() {
-        assert_eq!(2,   bitvec_to_decimal(&vec![0, 0, 0, 0, 0, 0, 1, 0]));
-        assert_eq!(8,   bitvec_to_decimal(&vec![0, 0, 0, 0, 1, 0, 0, 0]));
-        assert_eq!(42,  bitvec_to_decimal(&vec![0, 0, 1, 0, 1, 0, 1, 0]));
+        assert_eq!(2, bitvec_to_decimal(&vec![0, 0, 0, 0, 0, 0, 1, 0]));
+        assert_eq!(8, bitvec_to_decimal(&vec![0, 0, 0, 0, 1, 0, 0, 0]));
+        assert_eq!(42, bitvec_to_decimal(&vec![0, 0, 1, 0, 1, 0, 1, 0]));
         assert_eq!(250, bitvec_to_decimal(&vec![1, 1, 1, 1, 1, 0, 1, 0]));
     }
 
