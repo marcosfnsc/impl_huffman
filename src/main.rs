@@ -61,7 +61,6 @@ fn main() {
             idx_last += 8;
         }
         file.write(&[residual as u8]).unwrap();
-
     } else if args.len() == 4 && args[1] == "-d" && args[2] == "-f" {
         // descompress
 
@@ -87,11 +86,10 @@ fn main() {
         let mut file = fs::File::create(&args[3][..args[3].len() - 5]).unwrap();
 
         array_file_converted.reverse();
-        while array_file_converted.len() != 0 {
+        while !array_file_converted.is_empty() {
             file.write(&[huff::decode_element(&mut array_file_converted, &node_root)])
                 .unwrap();
         }
-
     } else if args.len() == 4 && args[1] == "-s" && args[2] == "-f" {
         // tabela de simbolos
 
