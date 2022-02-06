@@ -105,13 +105,10 @@ pub fn save_tree<T: Write>(node: &Tree, writer: &mut T) {
     }
 }
 
-pub fn restore_tree<'a, I>(array: I) -> Tree
-where
-    I: Iterator<Item = &'a u8>,
-{
-    match array.next().unwrap() {
+pub fn restore_tree(array: &mut Vec<u8>) -> Tree {
+    match array.pop().unwrap() {
         1 => Tree::Leaf {
-            element: *array.next().unwrap(),
+            element: array.pop().unwrap(),
             freq: 0,
         },
         2 => Tree::Node {
@@ -119,17 +116,15 @@ where
             right: Box::new(restore_tree(array)),
             freq: 0,
         },
+        _ => Tree::Leaf { element: 0, freq: 0}
     }
 }
 
-pub fn decode_element<'a, I>(bits: I, node: &Tree) -> u8
-where
-    I: Iterator<Item = &'a u8>,
-{
+pub fn decode_element(bits: &mut Vec<u8>, node: &Tree) -> u8 {
     match node {
         Tree::Leaf { element, .. } => *element,
         Tree::Node { left, right, .. } => {
-            if *bits.next().unwrap() == 0 {
+            if bits.pop().unwrap() == 0 {
                 decode_element(bits, left)
             } else {
                 decode_element(bits, right)
@@ -138,7 +133,9 @@ where
     }
 }
 
+/*
 #[cfg(test)]
 mod tests {
     use super::*;
 }
+*/
