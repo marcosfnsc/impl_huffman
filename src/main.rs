@@ -60,6 +60,8 @@ fn main() {
             idx_begin += 8;
             idx_last += 8;
         }
+        file.write(&[residual as u8]);
+
     } else if args.len() == 4 && args[1] == "-d" && args[2] == "-f" {
         // descompress
 
