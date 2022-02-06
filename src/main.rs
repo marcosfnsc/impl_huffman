@@ -68,7 +68,7 @@ fn main() {
         let mut array_file = fs::read(&args[3]).unwrap();
         let node_root = huff::restore_tree(array_file.iter());
 
-        let residual = array_file.remove(0);
+        let residual = array_file.pop().unwrap();
         let mut array_file_converted = {
             let mut bitvec = Vec::new();
             for byte in array_file {
@@ -76,7 +76,12 @@ fn main() {
             }
             bitvec
         };
-        array_file_converted.drain(0..residual as usize);
+
+        // remove residual  bits
+        for _ in 0..residual {
+            array_file_converted.pop().unwrap();
+        }
+
         let mut file = fs::File::create(&args[3][..args[3].len() - 5]).unwrap();
 
         while array_file_converted.len() != 0 {
