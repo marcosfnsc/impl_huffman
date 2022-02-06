@@ -46,21 +46,17 @@ fn main() {
             }
             size_array - bytes.len()
         };
-
-        file.write(&[residual as u8]).unwrap();
-        for _ in 0..residual {
-            bytes.push(0);
-        }
+        bytes.resize(bytes.len() + residual, 0);
 
         let mut idx_begin = 0;
         let mut idx_last = 8;
         while bytes.len() - 1 > idx_last {
-            file.write(&[utils::bitvec_to_decimal(&bytes[idx_begin..idx_last])])
+            file.write_all(&[utils::bitvec_to_decimal(&bytes[idx_begin..idx_last])])
                 .unwrap();
             idx_begin += 8;
             idx_last += 8;
         }
-        file.write(&[residual as u8]).unwrap();
+        file.write_all(&[residual as u8]).unwrap();
     } else if args.len() == 4 && args[1] == "-d" && args[2] == "-f" {
         // descompress
 
@@ -87,7 +83,7 @@ fn main() {
 
         array_file_converted.reverse();
         while !array_file_converted.is_empty() {
-            file.write(&[huff::decode_element(&mut array_file_converted, &node_root)])
+            file.write_all(&[huff::decode_element(&mut array_file_converted, &node_root)])
                 .unwrap();
         }
     } else if args.len() == 4 && args[1] == "-s" && args[2] == "-f" {
@@ -111,11 +107,11 @@ fn main() {
                 _ => print!("{:<10}", *key as char),
             }
 
-            print!("{:<12} {:<11} {:<11} {}", value, value, key, " ");
+            print!("{:<12} {:<11} {:<11} ", value, value, key);
             for bit in huff::encode_element(*key, &node_root) {
                 print!("{}", bit)
             }
-            println!(""); // pular linha
+            println!(); // pular linha
         }
     }
 }

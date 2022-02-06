@@ -19,9 +19,9 @@ impl Tree {
     }
 
     fn get_freq(&self) -> usize {
-        match self {
-            &Tree::Leaf { freq, .. } => freq,
-            &Tree::Node { freq, .. } => freq,
+        match *self {
+            Tree::Leaf { freq, .. } => freq,
+            Tree::Node { freq, .. } => freq,
         }
     }
 }
@@ -30,7 +30,7 @@ pub fn frequency(array: &[u8]) -> HashMap<&u8, usize> {
     let mut h_map = HashMap::new();
 
     for byte in array {
-        let counter = h_map.entry(byte).or_insert(0 as usize);
+        let counter = h_map.entry(byte).or_insert(0_usize);
         *counter += 1;
     }
     h_map
@@ -95,10 +95,10 @@ pub fn save_tree<T: Write>(node: &Tree, writer: &mut T) {
 
     match node {
         Tree::Leaf { element, .. } => {
-            writer.write(&[1, *element]).unwrap();
+            writer.write_all(&[1, *element]).unwrap();
         }
         Tree::Node { left, right, .. } => {
-            writer.write(&[2]).unwrap();
+            writer.write_all(&[2]).unwrap();
             save_tree(left, writer);
             save_tree(right, writer);
         }
