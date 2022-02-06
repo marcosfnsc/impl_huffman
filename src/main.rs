@@ -6,17 +6,17 @@ mod huff;
 mod utils;
 
 fn menu() {
+    let space = " ";
     println!("Compressão de Huffman – Análise de frequência símbolos e compressão de Huffman");
     println!("Uso: huff [-options] <file>\n");
     println!("Options:\n");
-    println!("-h {:>10} Mostra este texto de ajuda", " ");
-    println!("-c {:>10} Realiza a compressão", " ");
-    println!("-d {:>10} Realiza a descompressão", " ");
+    println!("-h {space:>10} Mostra este texto de ajuda");
+    println!("-c {space:>10} Realiza a compressão");
+    println!("-d {space:>10} Realiza a descompressão");
     println!(
-        "-s {:>10} Realiza apenas a análise de frequência e imprime a tabela de símbolos",
-        " "
+        "-s {space:>10} Realiza apenas a análise de frequência e imprime a tabela de símbolos"
     );
-    println!("-f <file> {:>3} Indica o arquivo a ser processado (comprimido, descomprimido ou para apresentar a tabela de símbolos)", " ");
+    println!("-f <file> {space:>3} Indica o arquivo a ser processado (comprimido, descomprimido ou para apresentar a tabela de símbolos)");
 }
 
 fn main() {
