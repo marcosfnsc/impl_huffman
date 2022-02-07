@@ -5,3 +5,12 @@ version = 3
 [[package]]
 name = "huff"
 version = "0.1.0"
+dependencies = [
+ "unchecked_unwrap",
+]
+
+[[package]]
+name = "unchecked_unwrap"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c24f3a206e040c2d1f2bc5987864f777cb807ad4f50bed46dbfa2af917be2d8"

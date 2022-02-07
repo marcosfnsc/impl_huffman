@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::io::Write;
+use unchecked_unwrap::UncheckedUnwrap;
 
 pub enum Tree {
     Node {
@@ -45,8 +46,8 @@ pub fn create_tree(elements: &HashMap<&u8, usize>) -> Tree {
     fn tree(nodes: &mut Vec<Tree>) {
         if nodes.len() > 1 {
             nodes.sort_by(|a, b| b.get_freq().cmp(&a.get_freq()));
-            let node0 = nodes.pop().unwrap();
-            let node1 = nodes.pop().unwrap();
+            let node0 = unsafe { nodes.pop().unchecked_unwrap() };
+            let node1 = unsafe { nodes.pop().unchecked_unwrap() };
 
             let root = Tree::Node {
                 freq: node0.get_freq() + node1.get_freq(),
@@ -60,7 +61,7 @@ pub fn create_tree(elements: &HashMap<&u8, usize>) -> Tree {
     }
 
     tree(&mut nodes);
-    nodes.pop().unwrap()
+    unsafe { nodes.pop().unchecked_unwrap() }
 }
 
 pub fn encode_element(elt: u8, node: &Tree) -> Vec<u8> {
