@@ -1,6 +1,6 @@
-use std::collections::HashMap;
 use std::io::Write;
 use unchecked_unwrap::UncheckedUnwrap;
+use rustc_hash::FxHashMap;
 
 pub enum Tree {
     Node {
@@ -27,8 +27,8 @@ impl Tree {
     }
 }
 
-pub fn frequency(array: &[u8]) -> HashMap<&u8, usize> {
-    let mut h_map = HashMap::new();
+pub fn frequency(array: &[u8]) -> FxHashMap<&u8, usize> {
+    let mut h_map = FxHashMap::default();
 
     for byte in array {
         let counter = h_map.entry(byte).or_insert(0_usize);
@@ -37,7 +37,7 @@ pub fn frequency(array: &[u8]) -> HashMap<&u8, usize> {
     h_map
 }
 
-pub fn create_tree(elements: &HashMap<&u8, usize>) -> Tree {
+pub fn create_tree(elements: &FxHashMap<&u8, usize>) -> Tree {
     let mut nodes = Vec::with_capacity(elements.len());
     for (k, v) in elements {
         nodes.push(Tree::new_leaf(**k, *v));
