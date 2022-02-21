@@ -19,18 +19,18 @@ fn menu() {
     println!("-f <file> {space:>3} Indica o arquivo a ser processado (comprimido, descomprimido ou para apresentar a tabela de símbolos)");
 }
 
-fn main() {
+fn main() -> Result<(), std::io::Error> {
     let args: Vec<String> = env::args().collect();
     if args.len() == 2 && args[1] == "-h" {
         menu();
     } else if args.len() == 4 && args[1] == "-c" && args[2] == "-f" {
         //compress
 
-        let array_file = fs::read(&args[3]).unwrap();
+        let array_file = fs::read(&args[3])?;
         let frequency = huff::frequency(&array_file);
         let node_root = huff::create_tree(&frequency);
 
-        let mut file = BufWriter::new(fs::File::create(args[3].clone() + ".huff").unwrap());
+        let mut file = BufWriter::new(fs::File::create(args[3].clone() + ".huff")?);
         huff::save_tree(&node_root, &mut file);
 
         let mut bytes = Vec::new();
@@ -51,16 +51,15 @@ fn main() {
         let mut idx_begin = 0;
         let mut idx_last = 8;
         while bytes.len() - 1 > idx_last {
-            file.write_all(&[utils::bitvec_to_decimal(&bytes[idx_begin..idx_last])])
-                .unwrap();
+            file.write_all(&[utils::bitvec_to_decimal(&bytes[idx_begin..idx_last])])?;
             idx_begin += 8;
             idx_last += 8;
         }
-        file.write_all(&[residual as u8]).unwrap();
+        file.write_all(&[residual as u8])?;
     } else if args.len() == 4 && args[1] == "-d" && args[2] == "-f" {
         // descompress
 
-        let mut array_file = fs::read(&args[3]).unwrap();
+        let mut array_file = fs::read(&args[3])?;
         array_file.reverse();
         let node_root = huff::restore_tree(&mut array_file);
         array_file.reverse();
@@ -79,17 +78,16 @@ fn main() {
             array_file_converted.pop().unwrap();
         }
 
-        let mut file = fs::File::create(&args[3][..args[3].len() - 5]).unwrap();
+        let mut file = fs::File::create(&args[3][..args[3].len() - 5])?;
 
         array_file_converted.reverse();
         while !array_file_converted.is_empty() {
-            file.write_all(&[huff::decode_element(&mut array_file_converted, &node_root)])
-                .unwrap();
+            file.write_all(&[huff::decode_element(&mut array_file_converted, &node_root)])?;
         }
     } else if args.len() == 4 && args[1] == "-s" && args[2] == "-f" {
         // tabela de simbolos
 
-        let array_file = fs::read(&args[3]).unwrap();
+        let array_file = fs::read(&args[3])?;
         let array_nodes = huff::frequency(&array_file);
         let node_root = huff::create_tree(&array_nodes);
 
@@ -114,4 +112,5 @@ fn main() {
             println!(); // pular linha
         }
     }
+    Ok(())
 }

@@ -1,6 +1,6 @@
+use rustc_hash::FxHashMap;
 use std::io::Write;
 use unchecked_unwrap::UncheckedUnwrap;
-use rustc_hash::FxHashMap;
 
 pub enum Tree {
     Node {
