@@ -105,9 +105,9 @@ fn main() -> Result<(), std::io::Error> {
                 _ => print!("{:<10}", *key as char),
             }
 
-            print!("{:<12} {:<11} {:<11} ", value, value, key);
+            print!("{value:<12} {value:<11} {key:<12} ");
             for bit in huff::encode_element(*key, &node_root) {
-                print!("{}", bit)
+                print!("{bit}")
             }
             println!(); // pular linha
         }
