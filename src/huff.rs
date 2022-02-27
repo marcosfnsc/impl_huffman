@@ -16,10 +16,6 @@ pub enum Tree {
 }
 
 impl Tree {
-    pub fn new_leaf(element: u8, freq: usize) -> Tree {
-        Self::Leaf { element, freq }
-    }
-
     fn get_freq(&self) -> usize {
         match *self {
             Tree::Leaf { freq, .. } => freq,
@@ -41,7 +37,10 @@ pub fn frequency(array: &[u8]) -> FxHashMap<&u8, usize> {
 pub fn create_tree(elements: &FxHashMap<&u8, usize>) -> Tree {
     let mut nodes = Vec::with_capacity(elements.len());
     for (k, v) in elements {
-        nodes.push(Tree::new_leaf(**k, *v));
+        nodes.push(Tree::Leaf {
+            element: **k,
+            freq: *v
+        });
     }
 
     fn tree(nodes: &mut Vec<Tree>) {
