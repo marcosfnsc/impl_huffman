@@ -14,7 +14,7 @@ pub fn menu() {
     println!("-d {space:>10} Realiza a descompressão");
     println!(
         "-s {space:>10} Realiza apenas a análise de frequência e imprime a tabela de símbolos"
-        );
+    );
     println!("-f <file> {space:>3} Indica o arquivo a ser processado (comprimido, descomprimido ou para apresentar a tabela de símbolos)");
 }
 
@@ -82,7 +82,7 @@ pub fn decompress(filename: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-pub fn analyze(filename: &str)-> Result<(), std::io::Error> {
+pub fn analyze(filename: &str) -> Result<(), std::io::Error> {
     let array_file = fs::read(filename)?;
     let array_nodes = huff::frequency(&array_file);
     let node_root = huff::create_tree(&array_nodes);

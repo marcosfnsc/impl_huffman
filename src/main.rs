@@ -1,7 +1,7 @@
-use std::env;
 use huff::{analyze, compress, decompress, menu};
+use std::env;
 
-fn main() -> Result<(), std::io::Error> {
+fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() == 2 && args[1] == "-h" {
         menu()
@@ -12,5 +12,4 @@ fn main() -> Result<(), std::io::Error> {
     } else if args.len() == 4 && args[1] == "-s" && args[2] == "-f" {
         analyze(&args[3]).unwrap();
     }
-    Ok(())
 }

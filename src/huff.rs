@@ -39,7 +39,7 @@ pub fn create_tree(elements: &FxHashMap<&u8, usize>) -> Tree {
     for (k, v) in elements {
         nodes.push(Tree::Leaf {
             element: **k,
-            freq: *v
+            freq: *v,
         });
     }
 
