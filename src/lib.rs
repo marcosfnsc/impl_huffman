@@ -82,7 +82,7 @@ pub fn decompress(filename: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn analyze(filename: &str)-> Result<(), std::io::Error> {
+pub fn analyze(filename: &str)-> Result<(), std::io::Error> {
     let array_file = fs::read(filename)?;
     let array_nodes = huff::frequency(&array_file);
     let node_root = huff::create_tree(&array_nodes);
