@@ -98,11 +98,11 @@ pub fn analyze(filename: &str) -> Result<(), std::io::Error> {
             27 => print!("{:<10}", "ESC"),
             32 => print!("{:<10}", "SPACE"),
             127 => print!("{:<10}", "DEL"),
-            _ => print!("{:<10}", *key as char),
+            _ => print!("{:<10}", key as char),
         }
 
         print!("{value:<12} {value:<11} {key:<12} ");
-        for bit in huff::encode_element(*key, &node_root) {
+        for bit in huff::encode_element(key, &node_root) {
             print!("{bit}")
         }
         println!(); // pular linha

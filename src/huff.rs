@@ -24,21 +24,21 @@ impl Tree {
     }
 }
 
-pub fn frequency(array: &[u8]) -> FxHashMap<&u8, usize> {
+pub fn frequency(array: &[u8]) -> FxHashMap<u8, usize> {
     let mut h_map = FxHashMap::default();
 
-    for byte in array {
+    for byte in array.iter().copied() {
         let counter = h_map.entry(byte).or_insert(0_usize);
         *counter += 1;
     }
     h_map
 }
 
-pub fn create_tree(elements: &FxHashMap<&u8, usize>) -> Tree {
+pub fn create_tree(elements: &FxHashMap<u8, usize>) -> Tree {
     let mut nodes = Vec::with_capacity(elements.len());
     for (k, v) in elements {
         nodes.push(Tree::Leaf {
-            element: **k,
+            element: *k,
             freq: *v,
         });
     }
