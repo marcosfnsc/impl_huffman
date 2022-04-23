@@ -26,7 +26,6 @@ impl Tree {
 
 pub fn frequency(array: &[u8]) -> FxHashMap<u8, usize> {
     let mut h_map = FxHashMap::default();
-
     for byte in array.iter().copied() {
         let counter = h_map.entry(byte).or_insert(0_usize);
         *counter += 1;
@@ -55,11 +54,9 @@ pub fn create_tree(elements: &FxHashMap<u8, usize>) -> Tree {
                 right: Box::new(node1),
             };
             nodes.push(root);
-
             tree(nodes);
         }
     }
-
     tree(&mut nodes);
     unsafe { nodes.pop().unchecked_unwrap() }
 }
@@ -75,7 +72,6 @@ pub fn encode_element(elt: u8, node: &Tree) -> Vec<u8> {
                 if result_left {
                     bits.push(0);
                 }
-
                 let result_right = walk_through_tree(element_target, right, bits);
                 if result_right {
                     bits.push(1);
