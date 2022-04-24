@@ -26,7 +26,7 @@ pub fn compress(filename: &str) -> Result<(), std::io::Error> {
     let mut file = BufWriter::new(fs::File::create(format!("{filename}.huff"))?);
     huff::save_tree(&node_root, &mut file);
 
-    let bytes: Vec<u8> = array_file
+    let mut bytes: Vec<u8> = array_file
         .into_iter()
         .flat_map(|byte| huff::encode_element(byte, &node_root))
         .collect();
@@ -40,15 +40,13 @@ pub fn compress(filename: &str) -> Result<(), std::io::Error> {
     };
     file.write_all(&[residual as u8])?;
 
-    let bytes = vec![(0..residual as u8).collect(), bytes];
-    let bytes: Vec<u8> = bytes.into_iter().flatten().collect();
-
-    let mut idx_begin = 0;
-    let mut idx_last = 8;
-    while bytes.len() >= idx_last {
-        file.write_all(&[utils::bitvec_to_decimal(&bytes[idx_begin..idx_last])])?;
-        idx_begin += 8;
-        idx_last += 8;
+    let bytes = {
+        let mut v = vec![0; residual];
+        v.append(&mut bytes);
+        v
+    };
+    for idx in (0..bytes.len()).into_iter().step_by(8) {
+        file.write_all(&[utils::bitvec_to_decimal(&bytes[idx..idx + 8])])?;
     }
     Ok(())
 }
