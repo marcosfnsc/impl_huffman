@@ -47,7 +47,7 @@ pub fn compress(filename: &str) -> Result<(), std::io::Error> {
 
     let mut idx_begin = 0;
     let mut idx_last = 8;
-    while bytes.len() - 1 >= idx_last {
+    while bytes.len() > idx_last {
         file.write_all(&[utils::bitvec_to_decimal(&bytes[idx_begin..idx_last])])?;
         idx_begin += 8;
         idx_last += 8;
@@ -60,13 +60,11 @@ pub fn decompress(filename: &str) -> Result<(), std::io::Error> {
     let mut array_iter = array_file.into_iter();
     let node_root = huff::restore_tree(&mut array_iter);
 
-    let residual = array_iter.next().unwrap();
-    let mut array_file_converted = array_iter.flat_map(utils::decimal_to_bitvec);
+    let residual = array_iter.next().unwrap() as usize;
+    let array_file_converted = array_iter.flat_map(utils::decimal_to_bitvec);
 
     // remove residual  bits
-    for _ in 0..residual {
-        array_file_converted.next().unwrap();
-    }
+    let array_file_converted = array_file_converted.skip(residual);
 
     //çet filename = filename.replace(".huff", "");
     //çet mut file = fs::File::create(filename)?;
