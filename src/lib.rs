@@ -58,14 +58,14 @@ pub fn decompress(filename: &str) -> Result<(), std::io::Error> {
     let mut array_iter = array_file.into_iter();
     let node_root = huff::restore_tree(&mut array_iter);
 
-    let residual = array_iter.next().unwrap() as usize;
-    let array_file_converted = array_iter.flat_map(utils::decimal_to_bitvec);
-    let array_file_converted = array_file_converted.skip(residual); // remove residual  bits
+    //let filename = filename.replace(".huff", "");
+    //let mut file = fs::File::create(filename)?;
 
-    //çet filename = filename.replace(".huff", "");
-    //çet mut file = fs::File::create(filename)?;
-
-    let mut array_file_converted = array_file_converted.peekable();
+    let residual = array_iter.next().unwrap();
+    let mut array_file_converted = array_iter
+        .flat_map(utils::decimal_to_bitvec)
+        .skip(residual as usize) // remove residual  bits
+        .peekable();
     while array_file_converted.peek().is_some() {
         let x = huff::decode_element(&mut array_file_converted, &node_root) as char;
         print!("{x}");
