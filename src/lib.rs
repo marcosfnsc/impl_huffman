@@ -22,15 +22,10 @@ pub fn compress(filename: &str) -> Result<(), std::io::Error> {
     let array_file = fs::read(filename)?;
     let frequency = huff::frequency(&array_file);
     let node_root = huff::create_tree(&frequency);
-
-    let mut file = BufWriter::new(fs::File::create(format!("{filename}.huff"))?);
-    huff::save_tree(&node_root, &mut file);
-
     let mut bytes: Vec<u8> = array_file
         .into_iter()
         .flat_map(|byte| huff::encode_element(byte, &node_root))
         .collect();
-
     let residual = {
         let mut size_array = bytes.len();
         while size_array % 8 != 0 {
@@ -38,13 +33,16 @@ pub fn compress(filename: &str) -> Result<(), std::io::Error> {
         }
         size_array - bytes.len()
     };
-    file.write_all(&[residual as u8])?;
-
     let bytes = {
         let mut v = vec![0; residual];
         v.append(&mut bytes);
         v
     };
+
+    let filename = format!("{filename}.huff");
+    let mut file = BufWriter::new(fs::File::create(filename)?);
+    huff::save_tree(&node_root, &mut file);
+    file.write_all(&[residual as u8])?;
     for idx in (0..bytes.len()).into_iter().step_by(8) {
         file.write_all(&[utils::bitvec_to_decimal(&bytes[idx..idx + 8])])?;
     }
@@ -56,17 +54,17 @@ pub fn decompress(filename: &str) -> Result<(), std::io::Error> {
     let mut array_iter = array_file.into_iter();
     let node_root = huff::restore_tree(&mut array_iter);
 
-    //let filename = filename.replace(".huff", "");
-    //let mut file = fs::File::create(filename)?;
-
     let residual = array_iter.next().unwrap();
-    let mut array_file_converted = array_iter
+    let mut array_iter = array_iter
         .flat_map(utils::decimal_to_bitvec)
         .skip(residual as usize) // remove residual  bits
         .peekable();
-    while array_file_converted.peek().is_some() {
-        let x = huff::decode_element(&mut array_file_converted, &node_root) as char;
-        print!("{x}");
+
+    let filename = filename.replace(".huff", "");
+    let mut file = BufWriter::new(fs::File::create(filename)?);
+    while array_iter.peek().is_some() {
+        let byte = huff::decode_element(&mut array_iter, &node_root);
+        file.write_all(&[byte])?;
     }
     Ok(())
 }
