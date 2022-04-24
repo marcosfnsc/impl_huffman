@@ -102,10 +102,10 @@ pub fn save_tree<T: Write>(node: &Tree, writer: &mut T) {
     }
 }
 
-pub fn restore_tree(array: &mut Vec<u8>) -> Tree {
-    match array.pop().unwrap() {
+pub fn restore_tree(array: &mut impl Iterator<Item = u8>) -> Tree {
+    match array.next().unwrap() {
         1 => Tree::Leaf {
-            element: array.pop().unwrap(),
+            element: array.next().unwrap(),
             freq: 0,
         },
         2 => Tree::Node {
@@ -120,11 +120,11 @@ pub fn restore_tree(array: &mut Vec<u8>) -> Tree {
     }
 }
 
-pub fn decode_element(bits: &mut Vec<u8>, node: &Tree) -> u8 {
+pub fn decode_element(bits: &mut impl Iterator<Item = u8>, node: &Tree) -> u8 {
     match node {
         Tree::Leaf { element, .. } => *element,
         Tree::Node { left, right, .. } => {
-            if bits.pop().unwrap() == 0 {
+            if bits.next().unwrap() == 0 {
                 decode_element(bits, left)
             } else {
                 decode_element(bits, right)
