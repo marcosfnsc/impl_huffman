@@ -38,42 +38,43 @@ pub fn compress(filename: &str) -> Result<(), std::io::Error> {
         }
         size_array - bytes.len()
     };
+    file.write_all(&[residual as u8])?;
+
     bytes.resize(bytes.len() + residual, 0);
+
+    let bytes = vec![(0..residual as u8).collect(), bytes];
+    let bytes: Vec<u8> = bytes.into_iter().flatten().collect();
 
     let mut idx_begin = 0;
     let mut idx_last = 8;
-    while bytes.len() - 1 > idx_last {
+    while bytes.len() - 1 >= idx_last {
         file.write_all(&[utils::bitvec_to_decimal(&bytes[idx_begin..idx_last])])?;
         idx_begin += 8;
         idx_last += 8;
     }
-    file.write_all(&[residual as u8])?;
     Ok(())
 }
 
 pub fn decompress(filename: &str) -> Result<(), std::io::Error> {
-    let mut array_file = fs::read(filename)?;
-    array_file.reverse();
-    let node_root = huff::restore_tree(&mut array_file);
-    array_file.reverse();
+    let array_file = fs::read(filename)?;
+    let mut array_iter = array_file.into_iter();
+    let node_root = huff::restore_tree(&mut array_iter);
 
-    let residual = array_file.pop().unwrap();
-    let mut array_file_converted: Vec<u8> = array_file
-        .into_iter()
-        .flat_map(utils::decimal_to_bitvec)
-        .collect();
+    let residual = array_iter.next().unwrap();
+    let mut array_file_converted = array_iter.flat_map(utils::decimal_to_bitvec);
 
     // remove residual  bits
     for _ in 0..residual {
-        array_file_converted.pop().unwrap();
+        array_file_converted.next().unwrap();
     }
 
-    let filename = filename.replace(".huff", "");
-    let mut file = fs::File::create(filename)?;
+    //çet filename = filename.replace(".huff", "");
+    //çet mut file = fs::File::create(filename)?;
 
-    array_file_converted.reverse();
-    while !array_file_converted.is_empty() {
-        file.write_all(&[huff::decode_element(&mut array_file_converted, &node_root)])?;
+    let mut array_file_converted = array_file_converted.peekable();
+    while array_file_converted.peek().is_some() {
+        let x = huff::decode_element(&mut array_file_converted, &node_root) as char;
+        print!("{x}");
     }
     Ok(())
 }
