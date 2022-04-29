@@ -1,15 +1,20 @@
-use huff::{analyze, compress, decompress, menu};
-use std::env;
+use clap::{arg, command};
+use huff::{analyze, compress, decompress};
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() == 2 && args[1] == "-h" {
-        menu()
-    } else if args.len() == 4 && args[1] == "-c" && args[2] == "-f" {
-        compress(&args[3]).unwrap();
-    } else if args.len() == 4 && args[1] == "-d" && args[2] == "-f" {
-        decompress(&args[3]).unwrap();
-    } else if args.len() == 4 && args[1] == "-s" && args[2] == "-f" {
-        analyze(&args[3]).unwrap();
+    let matches = command!()
+        .about("Análise de frequência de símbolos e compressão de Huffman")
+        .version("1.0")
+        .arg(arg!(-c --compress   <filename> "compress the file").required(false))
+        .arg(arg!(-d --decompress <filename> "decompress the file").required(false))
+        .arg(arg!(-s --analyze    <filename> "analyze the file").required(false))
+        .get_matches();
+
+    if let Some(filename) = matches.value_of("compress") {
+        compress(filename).unwrap();
+    } else if let Some(filename) = matches.value_of("decompress") {
+        decompress(filename).unwrap();
+    } else if let Some(filename) = matches.value_of("analyze") {
+        analyze(filename).unwrap();
     }
 }

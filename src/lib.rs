@@ -4,20 +4,6 @@ use std::io::{BufWriter, Write};
 mod huff;
 mod utils;
 
-pub fn menu() {
-    let space = " ";
-    println!("Compressão de Huffman – Análise de frequência símbolos e compressão de Huffman");
-    println!("Uso: huff [-options] <file>\n");
-    println!("Options:\n");
-    println!("-h {space:>10} Mostra este texto de ajuda");
-    println!("-c {space:>10} Realiza a compressão");
-    println!("-d {space:>10} Realiza a descompressão");
-    println!(
-        "-s {space:>10} Realiza apenas a análise de frequência e imprime a tabela de símbolos"
-    );
-    println!("-f <file> {space:>3} Indica o arquivo a ser processado (comprimido, descomprimido ou para apresentar a tabela de símbolos)");
-}
-
 pub fn compress(filename: &str) -> Result<(), std::io::Error> {
     let array_file = fs::read(filename)?;
     let frequency = huff::frequency(&array_file);
