@@ -1,10 +1,10 @@
 use std::fs;
-use std::io::{BufWriter, Write};
+use std::io::{self, BufWriter, Write};
 
 mod huff;
 mod utils;
 
-pub fn compress(filename: &str) -> Result<(), std::io::Error> {
+pub fn compress(filename: &str) -> io::Result<()> {
     let array_file = fs::read(filename)?;
     let frequency = huff::frequency(&array_file);
     let node_root = huff::create_tree(&frequency);
@@ -35,7 +35,7 @@ pub fn compress(filename: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-pub fn decompress(filename: &str) -> Result<(), std::io::Error> {
+pub fn decompress(filename: &str) -> io::Result<()> {
     let array_file = fs::read(filename)?;
     let mut array_iter = array_file.into_iter();
     let node_root = huff::restore_tree(&mut array_iter);
@@ -55,7 +55,7 @@ pub fn decompress(filename: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-pub fn analyze(filename: &str) -> Result<(), std::io::Error> {
+pub fn analyze(filename: &str) -> io::Result<()> {
     let array_file = fs::read(filename)?;
     let array_nodes = huff::frequency(&array_file);
     let node_root = huff::create_tree(&array_nodes);
