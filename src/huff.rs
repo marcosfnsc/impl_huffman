@@ -1,6 +1,5 @@
 use rustc_hash::FxHashMap;
 use std::io::Write;
-use unchecked_unwrap::UncheckedUnwrap;
 
 #[derive(PartialEq, Debug)]
 pub enum Tree {
@@ -45,8 +44,8 @@ pub fn create_tree(elements: &FxHashMap<u8, usize>) -> Tree {
     fn tree(nodes: &mut Vec<Tree>) {
         if nodes.len() > 1 {
             nodes.sort_by(|a, b| b.get_freq().cmp(&a.get_freq()));
-            let node0 = unsafe { nodes.pop().unchecked_unwrap() };
-            let node1 = unsafe { nodes.pop().unchecked_unwrap() };
+            let node0 = unsafe { nodes.pop().unwrap_unchecked() };
+            let node1 = unsafe { nodes.pop().unwrap_unchecked() };
 
             let root = Tree::Node {
                 freq: node0.get_freq() + node1.get_freq(),
@@ -58,7 +57,7 @@ pub fn create_tree(elements: &FxHashMap<u8, usize>) -> Tree {
         }
     }
     tree(&mut nodes);
-    unsafe { nodes.pop().unchecked_unwrap() }
+    unsafe { nodes.pop().unwrap_unchecked() }
 }
 
 pub fn encode_element(elt: u8, node: &Tree) -> Vec<u8> {
