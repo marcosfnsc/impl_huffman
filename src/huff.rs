@@ -112,10 +112,7 @@ pub fn restore_tree(array: &mut impl Iterator<Item = u8>) -> Tree {
             right: Box::new(restore_tree(array)),
             freq: 0,
         },
-        _ => Tree::Leaf {
-            element: 0,
-            freq: 0,
-        },
+        _ => unreachable!(),
     }
 }
 
