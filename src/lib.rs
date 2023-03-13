@@ -29,7 +29,7 @@ pub fn compress(filename: &str) -> io::Result<()> {
     let mut file = BufWriter::new(fs::File::create(filename)?);
     huff::save_tree(&node_root, &mut file);
     file.write_all(&[residual as u8])?;
-    for idx in (0..bytes.len()).into_iter().step_by(8) {
+    for idx in (0..bytes.len()).step_by(8) {
         file.write_all(&[utils::bitvec_to_decimal(&bytes[idx..idx + 8])])?;
     }
     Ok(())

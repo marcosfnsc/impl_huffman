@@ -25,7 +25,7 @@ impl Tree {
 
 enum TreeFlags {
     Leaf = 1,
-    Node = 2
+    Node = 2,
 }
 
 pub fn frequency(array: &[u8]) -> FxHashMap<u8, usize> {
@@ -48,7 +48,7 @@ pub fn create_tree(elements: &FxHashMap<u8, usize>) -> Tree {
 
     fn tree(nodes: &mut Vec<Tree>) {
         if nodes.len() > 1 {
-            nodes.sort_by(|a, b| b.get_freq().cmp(&a.get_freq()));
+            nodes.sort_by_key(|a| std::cmp::Reverse(a.get_freq()));
             let node0 = unsafe { nodes.pop().unwrap_unchecked() };
             let node1 = unsafe { nodes.pop().unwrap_unchecked() };
 
@@ -96,7 +96,9 @@ pub fn save_tree<T: Write>(node: &Tree, writer: &mut T) {
 
     match node {
         Tree::Leaf { element, .. } => {
-            writer.write_all(&[TreeFlags::Leaf as u8, *element]).unwrap();
+            writer
+                .write_all(&[TreeFlags::Leaf as u8, *element])
+                .unwrap();
         }
         Tree::Node { left, right, .. } => {
             writer.write_all(&[TreeFlags::Node as u8]).unwrap();
