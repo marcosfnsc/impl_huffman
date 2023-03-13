@@ -1,5 +1,5 @@
 use rustc_hash::FxHashMap;
-use std::io::Write;
+use std::{io::Write, u8};
 
 #[derive(PartialEq, Debug)]
 pub enum Tree {
@@ -21,6 +21,11 @@ impl Tree {
             Tree::Node { freq, .. } => freq,
         }
     }
+}
+
+enum TreeFlags {
+    Leaf = 1,
+    Node = 2
 }
 
 pub fn frequency(array: &[u8]) -> FxHashMap<u8, usize> {
@@ -91,10 +96,10 @@ pub fn save_tree<T: Write>(node: &Tree, writer: &mut T) {
 
     match node {
         Tree::Leaf { element, .. } => {
-            writer.write_all(&[1, *element]).unwrap();
+            writer.write_all(&[TreeFlags::Leaf as u8, *element]).unwrap();
         }
         Tree::Node { left, right, .. } => {
-            writer.write_all(&[2]).unwrap();
+            writer.write_all(&[TreeFlags::Node as u8]).unwrap();
             save_tree(left, writer);
             save_tree(right, writer);
         }
@@ -103,11 +108,11 @@ pub fn save_tree<T: Write>(node: &Tree, writer: &mut T) {
 
 pub fn restore_tree(array: &mut impl Iterator<Item = u8>) -> Tree {
     match array.next().unwrap() {
-        1 => Tree::Leaf {
+        byte if byte == TreeFlags::Leaf as u8 => Tree::Leaf {
             element: array.next().unwrap(),
             freq: 0,
         },
-        2 => Tree::Node {
+        byte if byte == TreeFlags::Node as u8 => Tree::Node {
             left: Box::new(restore_tree(array)),
             right: Box::new(restore_tree(array)),
             freq: 0,
